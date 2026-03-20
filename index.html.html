@@ -191,30 +191,31 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <div class="screen active" id="intro-screen">
   <div class="logo-badge">⬡ 衛福部 · 醫療資安認證系統 v3.1</div>
   <h1 class="main-title">醫療院所資安<br>認證考試</h1>
-  <p class="subtitle">完成影片觀看後填寫資料，解鎖線上測驗</p>
+  <p class="subtitle">填寫資料後觀看影片，即可開始考試</p>
 
   <div class="video-container">
     <div class="video-wrapper">
-      <div class="video-placeholder">
-        <div class="video-icon">▶</div>
-        <div class="video-lbl">MEDICAL CYBERSECURITY TRAINING</div>
-        <div style="font-size:.76rem;color:#475569;font-family:'Share Tech Mono',monospace;">請將此處替換為您的影片</div>
-      </div>
+      <iframe id="yt-player"
+        src="https://www.youtube.com/embed/DFZz7HwOGbs?enablejsapi=1&rel=0&modestbranding=1"
+        style="position:absolute;inset:0;width:100%;height:100%;border:0;"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
     <div class="video-footer">
-      <div class="video-time" id="vtime">0:00 / 3:00</div>
+      <div class="video-time" id="vtime">觀看中...</div>
       <div class="prog-wrap"><div class="prog-fill" id="vprog"></div></div>
       <div class="video-status" id="vstatus">請觀看影片</div>
     </div>
   </div>
 
-  <div class="watch-req">⚠ 須觀看至少 <strong>&nbsp;80%&nbsp;</strong> 影片進度，方可填寫資料與考試</div>
+  <div class="watch-req">⚠ 請填寫下方資料，並觀看至少 <strong>&nbsp;80%&nbsp;</strong> 影片後，即可開始考試</div>
 
   <div class="returning-banner" id="returning-banner">
     ✓ 已找到您的作答紀錄，免重新觀看影片，可直接開始考試！
   </div>
 
-  <div class="reg-card locked" id="reg-card">
+  <div class="reg-card" id="reg-card">
     <div class="reg-title">// 考生資料登錄</div>
     <div class="form-grid">
       <div class="fg full">
@@ -374,29 +375,79 @@ let qs=[],cur=0,ans={},vidProg=0,vidTimer=null,vidOK=false,regData={};
 // ═══════════════════════════════════════════════
 //  VIDEO TIMER
 // ═══════════════════════════════════════════════
-function startVid(){
-  vidTimer=setInterval(()=>{
-    vidProg=Math.min(vidProg+1,CFG.VID_DUR);
-    const pct=vidProg/CFG.VID_DUR;
-    document.getElementById('vprog').style.width=(pct*100)+'%';
-    const m=Math.floor(vidProg/60),s=vidProg%60;
-    document.getElementById('vtime').textContent=m+':'+s.toString().padStart(2,'0')+' / 3:00';
-    if(pct>=CFG.VID_REQ&&!vidOK){
-      vidOK=true;
-      document.getElementById('vstatus').textContent='✓ 已達觀看門檻';
-      document.getElementById('vstatus').style.color='var(--accent2)';
-      unlockForm();
-    }else if(!vidOK){
-      document.getElementById('vstatus').textContent='還需 '+Math.ceil((CFG.VID_REQ-pct)*CFG.VID_DUR)+' 秒';
+// ── YouTube IFrame API 偵測觀看進度 ──
+var ytPlayer, ytDuration=0, ytTimer=null;
+
+// YouTube API 載入完成後自動呼叫
+function onYouTubeIframeAPIReady(){
+  ytPlayer = new YT.Player('yt-player',{
+    events:{
+      'onReady': onYtReady,
+      'onStateChange': onYtState
     }
-    if(vidProg>=CFG.VID_DUR)clearInterval(vidTimer);
-  },1000);
+  });
+}
+
+function onYtReady(e){
+  ytDuration = ytPlayer.getDuration() || 0;
+  document.getElementById('vtime').textContent = '準備就緒，請開始觀看';
+}
+
+function onYtState(e){
+  // 1=播放, 2=暫停, 0=結束
+  if(e.data === YT.PlayerState.PLAYING){
+    if(!ytTimer) ytTimer = setInterval(updateYtProgress, 1000);
+  } else {
+    clearInterval(ytTimer); ytTimer = null;
+  }
+  if(e.data === YT.PlayerState.ENDED){
+    updateYtProgress();
+  }
+}
+
+function updateYtProgress(){
+  if(!ytPlayer || !ytPlayer.getDuration) return;
+  const dur = ytPlayer.getDuration();
+  const cur = ytPlayer.getCurrentTime();
+  if(dur <= 0) return;
+  const pct = cur / dur;
+  vidProg = cur; // 已觀看秒數
+
+  document.getElementById('vprog').style.width = Math.min(pct*100,100)+'%';
+
+  // 顯示時間
+  const m = Math.floor(cur/60), s = Math.floor(cur%60);
+  const tm = Math.floor(dur/60), ts = Math.floor(dur%60);
+  document.getElementById('vtime').textContent =
+    m+':'+String(s).padStart(2,'0')+' / '+tm+':'+String(ts).padStart(2,'0');
+
+  if(pct >= CFG.VID_REQ && !vidOK){
+    vidOK = true;
+    clearInterval(ytTimer); ytTimer = null;
+    document.getElementById('vstatus').textContent = '✓ 已達觀看門檻';
+    document.getElementById('vstatus').style.color = 'var(--accent2)';
+    unlockForm();
+  } else if(!vidOK){
+    const remain = Math.ceil((CFG.VID_REQ - pct) * dur);
+    document.getElementById('vstatus').textContent = '還需約 '+remain+' 秒';
+  }
+}
+
+function startVid(){
+  // YouTube 模式：不使用模擬計時器，改由 YT API 觸發
+  // 動態載入 YouTube IFrame API
+  if(!window.YT){
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  } else if(window.YT && window.YT.Player) {
+    onYouTubeIframeAPIReady();
+  }
 }
 startVid();
 
 function unlockForm(){
-  const c=document.getElementById('reg-card');
-  c.classList.remove('locked');
+  // 表單預設開放填寫，影片完成後解鎖開始按鈕
   updateBtn();
 }
 
@@ -407,7 +458,7 @@ function checkReturning(){
   const name=document.getElementById('f-name').value.trim();
   const clinic=document.getElementById('f-clinic').value.trim();
   const code=document.getElementById('f-code').value.trim();
-  if(!name||!clinic||!code)return;
+  if(!name)return;
   const key=`quiz_rec_${name}_${clinic}_${code}`;
   const stored=localStorage.getItem(key);
   const banner=document.getElementById('returning-banner');
@@ -466,6 +517,7 @@ function shuffleOptions(q){
 
 function tryStart(){
   regData={clinic:v('f-clinic'),code:v('f-code'),name:v('f-name'),title:v('f-title')};
+  saveRecord(); // 開始考試即儲存，確保重做時不需重看影片
   clearInterval(vidTimer);
   const themeP=shuffle(THEME_Q).slice(0,CFG.THEME_N);
   const situP=shuffle(SITU_Q).slice(0,CFG.SITU_N);
@@ -706,17 +758,38 @@ function retryWrong(){
 }
 
 function restartAll(){
-  vidProg=0;vidOK=false;
-  document.getElementById('vprog').style.width='0%';
-  document.getElementById('vtime').textContent='0:00 / 3:00';
-  document.getElementById('vstatus').textContent='請觀看影片';
-  document.getElementById('vstatus').style.color='';
-  document.getElementById('start-btn').disabled=true;
-  document.getElementById('start-btn').textContent='🔒 開始考試';
-  document.getElementById('reg-card').classList.add('locked');
-  document.getElementById('returning-banner').style.display='none';
-  showScreen('intro-screen');
-  startVid();
+  // 判斷是否為已有紀錄的回測考生（regData 仍存在且有儲存紀錄）
+  const hasRecord = regData.name && regData.clinic && regData.code &&
+    localStorage.getItem('quiz_rec_'+regData.name+'_'+regData.clinic+'_'+regData.code);
+
+  if(hasRecord){
+    // 回測考生：保留資料，直接跳過影片，重新開始考試
+    vidOK=true;
+    vidProg=CFG.VID_DUR;
+    document.getElementById('vprog').style.width='100%';
+    document.getElementById('vstatus').textContent='✓ 已驗證回測考生';
+    document.getElementById('vstatus').style.color='var(--accent2)';
+    document.getElementById('vtime').textContent='3:00 / 3:00';
+    clearInterval(vidTimer);
+    // 保留表單資料並解鎖
+    document.getElementById('reg-card').classList.remove('locked');
+    document.getElementById('returning-banner').style.display='flex';
+    document.getElementById('start-btn').disabled=false;
+    document.getElementById('start-btn').textContent='▶ 開始考試';
+    showScreen('intro-screen');
+  } else {
+    // 新考生：完整重置，需重看影片
+    vidProg=0;vidOK=false;
+    document.getElementById('vprog').style.width='0%';
+    document.getElementById('vtime').textContent='0:00 / 3:00';
+    document.getElementById('vstatus').textContent='請觀看影片';
+    document.getElementById('vstatus').style.color='';
+    document.getElementById('start-btn').disabled=true;
+    document.getElementById('start-btn').textContent='🔒 開始考試';
+    document.getElementById('returning-banner').style.display='none';
+    showScreen('intro-screen');
+    startVid();
+  }
 }
 
 // ═══════════════════════════════════════════════
