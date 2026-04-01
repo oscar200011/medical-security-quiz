@@ -549,7 +549,7 @@ function checkReturning(){
       document.getElementById('vprog').style.width='100%';
       document.getElementById('vstatus').textContent='✓ 已驗證回測考生';
       document.getElementById('vstatus').style.color='var(--accent2)';
-      document.getElementById('vtime').textContent='3:00 / 3:00';
+     // document.getElementById('vtime').textContent='3:00 / 3:00';
       clearInterval(vidTimer);
       unlockForm();
     }
@@ -847,7 +847,7 @@ function restartAll(){
     document.getElementById('vprog').style.width='100%';
     document.getElementById('vstatus').textContent='✓ 已驗證回測考生';
     document.getElementById('vstatus').style.color='var(--accent2)';
-    document.getElementById('vtime').textContent='3:00 / 3:00';
+   // document.getElementById('vtime').textContent='3:00 / 3:00';
     clearInterval(vidTimer);
     // 保留表單資料並解鎖
     document.getElementById('reg-card').classList.remove('locked');
@@ -859,7 +859,7 @@ function restartAll(){
     // 新考生：完整重置，需重看影片
     vidProg=0;vidOK=false;
     document.getElementById('vprog').style.width='0%';
-    document.getElementById('vtime').textContent='0:00 / 3:00';
+   // document.getElementById('vtime').textContent='0:00 / 3:00';
     document.getElementById('vstatus').textContent='請觀看影片';
     document.getElementById('vstatus').style.color='';
     document.getElementById('start-btn').disabled=true;
@@ -1030,10 +1030,46 @@ function launchConfetti(){
   }
   setTimeout(()=>{c.innerHTML='';},5000);
 }
+// --- 1. 核心顯示函數 (保持原樣，僅插入觸發邏輯) ---
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+
+  // 💡 關鍵修正：當畫面切換到結果頁時，自動抓取畫面上的分數並傳送
+  if(id === 'result-screen') {
+    const scoreElement = document.getElementById('result-score'); // 抓取畫面上的分數元素
+    const finalScore = scoreElement ? parseInt(scoreElement.textContent) : 0;
+    
+    // 只有及格才傳送，或者您可以拿掉 if 條件全部傳送
+    if(finalScore >= 80) {
+      submitData({
+        name: document.getElementById('name').value,
+        clinic: document.getElementById('clinic').value,
+        email: document.getElementById('email').value,
+        score: finalScore
+      });
+    }
+  }
+}
+
+// --- 2. 新增提交資料到 Python (ngrok) 的功能 ---
+async function submitData(data) {
+  const NGROK_URL = "https://nippy-nonadmissibly-olin.ngrok-free.dev/submit";
+
+  try {
+    const response = await fetch(NGROK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      console.log("✅ 成功傳回台南主機");
+    }
+  } catch (error) {
+    console.error("❌ 連線失敗:", error);
+  }
 }
 </script>
 
