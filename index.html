@@ -56,14 +56,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .main-title{font-size:clamp(1.5rem,4vw,2.6rem);font-weight:900;line-height:1.3;margin-bottom:.4rem;background:linear-gradient(135deg,#003399 0%,#0066cc 50%,#0099cc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .subtitle{font-size:1rem;color:var(--muted);margin-bottom:2rem;font-weight:300;}
 
-
 .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1b2a,#1a2a3a);gap:.8rem;}
-
-
-
-
-
-
 
 .video-status{font-size:.8rem;color:var(--muted);text-align:right;min-width:80px;}
 
@@ -157,14 +150,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* Email section — only for passing */
 
-
-
-
-
-
-
-
-
 .es-ok{color:var(--accent2);background:rgba(0,255,157,.08);}
 .es-err{color:var(--danger);background:rgba(255,77,106,.08);}
 
@@ -231,9 +216,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .survey-done h3{font-size:1.3rem;font-weight:900;color:var(--accent);margin-bottom:.5rem;}
 .survey-done p{color:var(--muted);font-size:.9rem;}
 
-
 .particles{display:none;}
-
 
 .confetti-c{position:fixed;inset:0;pointer-events:none;z-index:100;overflow:hidden;}
 .confetti-p{position:absolute;top:-20px;animation:confettiFall linear forwards;}
@@ -329,7 +312,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
   </div>
 
-  <button class="start-btn" id="start-btn" disabled onclick="playSound('submit');tryStart()">下一步 →</button>
+  <button class="start-btn" id="start-btn" onclick="playSound('submit');tryStart()">下一步 →</button>
 </div>
 
 <!-- ══ QUIZ ══ -->
@@ -378,7 +361,6 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="stat-box"><div class="stat-val" id="rtotal" style="color:var(--accent)">10</div><div class="stat-lbl">總題數</div></div>
     </div>
     <!-- 問卷提醒（通過者才顯示） -->
-
 
     <div class="result-btns">
       <button class="btn-primary" id="btn-survey" onclick="playSound('nav');showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);">📝 填寫課後問卷</button>
@@ -489,15 +471,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   </div>
 </div>
 
-
-
 <script>
-let cardsAllRead = false; // 圖卡閱讀門檻
-console.log('[Debug] 初始化：cardsAllRead=false, vidOK will be true');
+let cardsAllRead = false;
 
-// ═══════════════════════════════════════════════
-//  QUESTION BANKS
-// ═══════════════════════════════════════════════
 const THEME_Q_ENC=[{"question": "基層診所若無專屬資安人員,建議應如何維護電腦作業系統以降低風險?", "options": {"A": "(A) 只要能運作就不需要更新", "B": "(B)至少更新至官方仍在支援週期內的作業系統（如 Windows 10 / 11）並開啟內建防護", "C": "(C) 僅需安裝防火牆不需防毒軟體", "D": "(D) 使用 Windows 7 即可滿足需求"}, "answer": "A", "explanation": "建議診所應安裝合法防毒軟體,或至少更新至官方仍在支援週期內的作業系統（如 Windows 10 / 11）並開啟內建之 Windows defender 進行防護,以避免惡意程式透過系統漏洞滲透。", "type": "主題"}, {"question": "根據衛生福利部資訊處的「基層診所資訊安全自我檢核表」之建議,電腦密碼的「最長有效期」應設定為多少天(含)以下?", "options": {"A": "(A) 30 天", "B": "(B) 60 天", "C": "(C) 90 天", "D": "(D) 180 天"}, "answer": "B", "explanation": "根據診所資安檢核表第 6 項規定,電腦密碼的「最長有效期」建議應設定為 90 天(含)或以下,但若有密碼外洩之風險時,則應立即修改。", "type": "主題"}, {"question": "符合「較強的密碼規則」的建議為何?", "options": {"A": "(A) 長度至少 8 個字元並混合三種字元類型", "B": "(B) 使用與帳號相同的密碼以利記憶", "C": "(C) 每兩年變更一次密碼", "D": "(D) 優先使用有意義的英文單字"}, "answer": "D", "explanation": "強密碼規則應至少 8 個字元以上,混合字母大小寫、數字及特殊符號(任選三種),且應定期變更並避免使用有意義單字。", "type": "主題"}, {"question": "根據衛福部資訊處「基層診所資訊安全自我檢核表」，電腦閒置時，螢幕應在多久內自動鎖定較為適當？", "options": {"A": "(A)不需設定螢幕鎖定", "B": "(B) 鎖定時間以不超過 15 分鐘為原則", "C": "(C) 下班時手動鎖定即可", "D": "(D) 鎖定時間應設定為 1 小時"}, "answer": "A", "explanation": "應啟動螢幕保護,且螢幕鎖定之時間設定以不超過 15 分鐘為原則。", "type": "主題"}, {"question": "當電腦設備報廢或丟棄前,應如何處理儲存的資訊?", "options": {"A": "(A) 格式化一次即可", "B": "(B) 執行刪除動作並徹底消磁或銷毀", "C": "(C) 直接送至回收場", "D": "(D) 只要硬體損壞就不需處理資料"}, "answer": "A", "explanation": "任何儲存資訊之電子設備於報廢前,應將資訊刪除,並徹底消磁或銷毀至無法解讀之程", "type": "主題"}, {"question": "若電腦不幸遭受勒索病毒入侵並顯示勒索畫面,首要應對措施為何?", "options": {"A": "(A) 立即關機重啟", "B": "(B) 立即通報主管機關、進行網路隔離並報警", "C": "(C) 支付贖金以救回資料", "D": "(D) 嘗試聯繫駭客議價"}, "answer": "A", "explanation": "遭受入侵時,須立即通報主管機關(如縣市衛生局),儘速做必要的網路隔離並啟動防禦機制,主動報警。", "type": "主題"}, {"question": "關於醫事人員卡(HCA)的使用,若醫師因忙碌將卡片與密碼交給護理師代為處理轉診或病歷登載,下列敘述何者正確?", "options": {"A": "(A) 為了行政效率,這是受鼓勵的行為", "B": "(B) 此行為破壞了電子簽章的「不可否認性」", "C": "(C) 只要醫師在場,交由他人操作並無法律風險", "D": "(D) 此行為僅違反診所內規,不涉及刑責"}, "answer": "A", "explanation": "出借醫事人員卡會破壞電子簽章的不可否認性,醫師可能被追究偽造文書或詐欺等刑責。", "type": "主題"}, {"question": "高雄某牙醫師（同時為診所負責人）在社群平台上傳含有病患個資的螢幕照片。該醫師的行為同時違反了《醫師法》與《醫療法》的保密規定。依據現行法規與罰則輕重，衛生機關通常會優先適用哪一項法律來裁處？", "options": {"A": "(A) 醫師法", "B": "(B) 醫療法", "C": "(C) 刑法", "D": "(D) 健保法"}, "answer": "A", "explanation": "《醫療法》第 72 條規範「醫療機構及其人員」皆不得無故洩漏病患個資。本案中，洩漏個資的牙醫師因同時具備診所負責人身分，其行為同時違反《醫師法》（罰鍰 2~10 萬）與《醫療法》（罰鍰 5~25 萬）。依據行政罰法「一行為違反數個行政法上義務規定而應處罰鍰者，依法定罰鍰額最高之規定裁處」的原則，衛生局會優先以罰則較重的《醫療法》進行裁處。", "type": "主題"}, {"question": "根據修正後的「醫療機構電子病歷製作及管理辦法」,醫療機構運用雲端服務儲存電子病歷資料時,其資料儲存地點原則上應設置於何處?", "options": {"A": "(A) 境外", "B": "(B) 境內", "C": "(C) 委外廠商辦公室", "D": "(D) 醫師住所"}, "answer": "A", "explanation": "對於雲端服務之資料儲存地點,以設置於境內為原則,除非情況特殊經中央主管機關核准,始得設置於境外。", "type": "主題"}, {"question": "依據《個人資料保護法》第 29 條,若非公務機關(如診所)因過失致個資遭不法洩漏,被害人若不易證明損害額,法院得按每人每一事件求償之金額範圍為何?", "options": {"A": "(A) 100 元至 1 萬元", "B": "(B) 500 元至 2 萬元", "C": "(C) 1,000 元至 5 萬元", "D": "(D) 無金額上限限制"}, "answer": "A", "explanation": "《個資法》規定,若不易證明損害,賠償金以每人每一事件新台幣 500 元以上、2 萬元以下計算。", "type": "主題"}]
 
 // 答案解密（ROT3 解碼）
@@ -509,14 +485,6 @@ const THEME_Q = THEME_Q_ENC.map(function(q){
 const SITU_Q=[];
 
 
-// ═══════════════════════════════════════════════
-//  IMAGES (base64)
-// ═══════════════════════════════════════════════
-
-
-// ═══════════════════════════════════════════════
-//  CONFIG
-// ═══════════════════════════════════════════════
 const CFG={
   THEME_N:10, SITU_N:0, PASS:80,
   VID_DUR:180, VID_REQ:0,
@@ -524,30 +492,17 @@ const CFG={
   GSHEET_URL:(function(){return atob('aHR0cHM6Ly9zY3JpcHQuZ29vZ2xlLmNvbS9tYWNyb3Mvcy9BS2Z5Y2J3QVRhYjNDa3lXdDA3ZGxYUERxUlhUVy00MEtxb3Z4dmVoMFo4bVNvRUcweXNHTldudi1lenFoZjVWam1VNE5OQXRudy9leGVj');})(),
 };
 
-// ═══════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════
 let qs=[],cur=0,ans={},vidProg=0,vidTimer=null,vidOK=true,regData={},lastScore=0,lastPassed=false;
 
-// ═══════════════════════════════════════════════
-//  PARTICLES
-// ═══════════════════════════════════════════════
 (()=>{const c=document.getElementById('particles');for(let i=0;i<28;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.width=p.style.height=(1+Math.random()*2)+'px';c.appendChild(p);}})();
 
-// ═══════════════════════════════════════════════
-//  VIDEO TIMER
-// ═══════════════════════════════════════════════
 // ── YouTube IFrame API 偵測觀看進度 ──
-
 
 function unlockForm(){
   // 表單預設開放填寫，影片完成後解鎖開始按鈕
   updateBtn();
 }
 
-// ═══════════════════════════════════════════════
-//  RETURNING CANDIDATE CHECK (姓名+診所+機構代碼)
-// ═══════════════════════════════════════════════
 function checkReturning(){
   const name=document.getElementById('f-name').value.trim();
   const clinic=document.getElementById('f-clinic').value.trim();
@@ -581,18 +536,10 @@ function onFormInput(){
 }
 
 function updateBtn(){
-  // 新流程：填完資料就可以點，不需要先讀圖卡
-  const c=v('f-clinic'),co=v('f-code'),n=v('f-name'),t=v('f-title');
-  const ok=c&&co&&n&&t;
-  const btn=document.getElementById('start-btn');
-  btn.disabled=!ok;
-  btn.textContent=ok?'下一步 →':'🔒 下一步（請填寫資料）';
+  // 按鈕永遠可點，點了之後 tryStart 裡驗證
 }
 function v(id){return document.getElementById(id).value.trim();}
 
-// ═══════════════════════════════════════════════
-//  QUIZ START
-// ═══════════════════════════════════════════════
 // 零寬字元混淆：視覺上正常，複製後AI看到的是混亂文字
 function obfuscateText(text){
   // 零寬字元集合（不可見）
@@ -634,16 +581,30 @@ function shuffleOptions(q){
 }
 
 function tryStart(){
+  // 驗證表單
+  const c=v('f-clinic'),co=v('f-code'),n=v('f-name'),t=v('f-title');
+  if(!c||!co||!n||!t){
+    alert('請填寫所有欄位後再繼續');
+    return;
+  }
   // 先儲存報名資料
-  regData={clinic:v('f-clinic'),code:v('f-code'),name:v('f-name'),title:v('f-title')};
+  regData={clinic:c,code:co,name:n,title:t};
   saveRecord();
   clearInterval(vidTimer);
   // 步驟指示器：進入步驟2
   setStep(2);
   // 每次考試前都先顯示圖卡
   cardsAllRead = false;
-  for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
-  initCardReader();
+  // 用 setTimeout 確保 Script 2（含 initCardReader）已載入
+  setTimeout(function(){
+    if(typeof initCardReader === 'function'){
+      for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
+      initCardReader();
+    } else {
+      // 直接顯示 overlay
+      document.getElementById('card-reader-overlay').style.display='flex';
+    }
+  }, 50);
 }
 
 function setStep(n){
@@ -753,9 +714,6 @@ function confirmSubmit(){
   calcResult();
 }
 
-// ═══════════════════════════════════════════════
-//  RESULT
-// ═══════════════════════════════════════════════
 function calcResult(){
   showScreen('result-screen');
   let correct=0;
@@ -799,17 +757,11 @@ function calcResult(){
 
 }
 
-// ═══════════════════════════════════════════════
-//  LOCAL STORAGE (回測考生識別)
-// ═══════════════════════════════════════════════
 function saveRecord(){
   const key=`quiz_rec_${regData.name}_${regData.clinic}_${regData.code}`;
   localStorage.setItem(key,JSON.stringify({name:regData.name,clinic:regData.clinic,code:regData.code,ts:Date.now()}));
 }
 
-// ═══════════════════════════════════════════════
-//  後端 API 提交（ngrok / Render）
-// ═══════════════════════════════════════════════
 async function submitData(data){
   if(!CFG.API_URL||CFG.API_URL==='YOUR_API_URL') return;
   try{
@@ -833,7 +785,6 @@ async function submitData(data){
     });
     if(response.ok){
       const result = await response.json();
-      console.log('✅ 後端提交成功:', result);
       // 若後端回傳新的分數（後端驗證），更新畫面
       return true;
     } else {
@@ -846,13 +797,8 @@ async function submitData(data){
   }
 }
 
-// ═══════════════════════════════════════════════
-//  GOOGLE SHEETS SYNC
-// ═══════════════════════════════════════════════
 function syncToGSheet(score,correct,wrong,pass){
-  console.log('[GSheet] GSHEET_URL:', CFG.GSHEET_URL);
   if(!CFG.GSHEET_URL||CFG.GSHEET_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL'){
-    console.log('[GSheet] ❌ GSHEET_URL 未設定，跳過');
     return;
   }
   const payload={
@@ -867,27 +813,17 @@ function syncToGSheet(score,correct,wrong,pass){
     passed:  pass,
     userAns: ans
   };
-  console.log('[GSheet] 送出考試資料:', JSON.stringify(payload).substring(0,200));
   fetch(CFG.GSHEET_URL,{
     method:'POST',
     mode:'no-cors',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify(payload)
   }).then(r=>{
-    console.log('[GSheet] ✅ 考試資料送出成功（no-cors 無法看回應）');
   }).catch(e=>{
-    console.log('[GSheet] ❌ 考試資料送出失敗:', e);
   });
 }
 
-// ═══════════════════════════════════════════════
-//  EMAIL
-// ═══════════════════════════════════════════════
 
-
-// ═══════════════════════════════════════════════
-//  REVIEW
-// ═══════════════════════════════════════════════
 function showReview(){
   showScreen('review-screen');
   const list=document.getElementById('rv-list');list.innerHTML='';
@@ -926,23 +862,36 @@ function showReview(){
   });
 }
 
-// ═══════════════════════════════════════════════
-//  RETRY
-// ═══════════════════════════════════════════════
 function restartAll(){
+  // 重置考試狀態
   qs = []; ans = {}; cur = 0;
   cardsAllRead = false;
+  // 重置問卷狀態
+  Object.keys(surveyAns).forEach(k => delete surveyAns[k]);
+  const survDone    = document.getElementById('survey-done');
+  const survActions = document.getElementById('survey-actions');
+  const survProg    = document.getElementById('survey-prog');
+  const btnSurvey   = document.getElementById('btn-survey');
+  if(survDone)    survDone.style.display    = 'none';
+  if(survActions) survActions.style.display = 'flex';
+  if(survProg)    survProg.style.width      = '0%';
+  if(btnSurvey)   btnSurvey.style.display   = 'inline-block';
+  // 重置問卷選項（取消所有選取）
+  document.querySelectorAll('.sq-opt.selected').forEach(el => el.classList.remove('selected'));
+  const sq5 = document.getElementById('sq5-text');
+  if(sq5) sq5.value = '';
+  // 重置問卷每題顯示
+  [1,2,3,4,5].forEach(i => {
+    const el = document.getElementById('sq'+i);
+    if(el) el.style.display = '';
+  });
+  // 回到首頁
   document.getElementById('reg-card').classList.remove('locked');
   document.getElementById('returning-banner').style.display = 'none';
   showScreen('intro-screen');
   setStep(1);
-  updateBtn();
 }
 
-
-// ═══════════════════════════════════════════════
-//  SURVEY（課後問卷）
-// ═══════════════════════════════════════════════
 const surveyAns = {}; // { 1:3, 2:5, 3:4, 4:5, 5:'建議文字' }
 
 function setSurvey(qNum, val, btn){
@@ -998,21 +947,16 @@ function submitSurveyData(){
     q5: surveyAns[5]||'',
   };
   // Google Sheets 同步
-  console.log('[Survey] GSHEET_URL:', CFG.GSHEET_URL);
   if(CFG.GSHEET_URL && CFG.GSHEET_URL!=='YOUR_GOOGLE_APPS_SCRIPT_URL'){
     const survPayload = Object.assign({type:'survey', token:atob('dGFpbmFuLWFpLXF1aXotMjAyNQ=='), score:lastScore||0, passed:lastPassed||false}, payload);
-    console.log('[Survey] 送出問卷資料:', JSON.stringify(survPayload).substring(0,200));
     fetch(CFG.GSHEET_URL,{
       method:'POST', mode:'no-cors',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(survPayload)
     }).then(r=>{
-      console.log('[Survey] ✅ 問卷資料送出成功');
     }).catch(e=>{
-      console.log('[Survey] ❌ 問卷資料送出失敗:', e);
     });
   } else {
-    console.log('[Survey] ❌ GSHEET_URL 未設定或錯誤');
   }
   // 後端 API
   if(CFG.API_URL && CFG.API_URL!=='YOUR_API_URL'){
@@ -1020,14 +964,10 @@ function submitSurveyData(){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
-    }).catch(e=>console.log('survey api error:',e));
+    }).catch(e=>console.log('survey API error:',e));
   }
-  console.log('問卷資料:', payload);
 }
 
-// ═══════════════════════════════════════════════
-//  CONFETTI & UTILS
-// ═══════════════════════════════════════════════
 function launchConfetti(){
   const cols=['#00d4ff','#00ff9d','#ffb830','#ff4d6a','#fff'];
   const c=document.getElementById('confetti');c.innerHTML='';
@@ -1047,6 +987,66 @@ function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+}
+
+
+// ── 圖卡相關函數（從 Script 2 前移）──
+function initCardReader(){
+  // 建立 dots
+  const dotsEl = document.getElementById('card-dots');
+  dotsEl.innerHTML = CARDS_DATA.map((_,i)=>`<div class="card-dot" id="dot-${i}"></div>`).join('');
+  showCard(0);
+  document.getElementById('card-reader-overlay').style.display='flex';
+}
+
+function showCard(idx){
+  cardIdx = idx;
+  cardRead[idx] = true;
+  const card = CARDS_DATA[idx];
+  // 懶加載：從 CARD_SRCS 取圖
+  const imgEl=document.getElementById('card-img');
+  imgEl.src='';
+  imgEl.src=CARD_SRCS[card.key]||'';
+  document.getElementById('card-scroll-area').scrollTop = 0;
+  // 更新 dots
+  document.querySelectorAll('.card-dot').forEach((d,i)=>{
+    d.className = 'card-dot' + (cardRead[i]?' read':'') + (i===idx?' current':'');
+  });
+  // 按鈕
+  document.getElementById('card-prev').disabled = (idx===0);
+  document.getElementById('card-prev').style.opacity = idx===0?'0.3':'1';
+  const allRead = cardRead.every(Boolean);
+  if(idx === CARDS_DATA.length-1){
+    document.getElementById('card-next').style.display = 'none';
+    document.getElementById('card-finish').style.display = allRead?'inline-block':'none';
+  } else {
+    document.getElementById('card-next').style.display = 'inline-block';
+    document.getElementById('card-finish').style.display = 'none';
+  }
+  // 進度
+  const readCount = cardRead.filter(Boolean).length;
+  document.getElementById('card-prog-text').textContent = readCount+' / '+CARDS_DATA.length+' 已閱讀';
+  // 若全讀完但不在最後一張，在最後一張才顯示完成
+}
+
+function cardNav(dir){
+  const next = cardIdx + dir;
+  if(next < 0 || next >= CARDS_DATA.length) return;
+  playSound('nav');
+  showCard(next);
+  // 若已全讀完，在最後一張顯示完成按鈕
+  if(next === CARDS_DATA.length-1 && cardRead.every(Boolean)){
+    document.getElementById('card-finish').style.display='inline-block';
+  }
+}
+
+
+function finishCards(){
+  cardsAllRead = true;
+  playSound('pass');
+  document.getElementById('card-reader-overlay').style.display='none';
+  // 直接開始考試
+  startQuiz();
 }
 </script>
 
@@ -1115,7 +1115,6 @@ let cardIdx = 0;
 const cardRead = new Array(CARDS_DATA.length).fill(false);
 
 function initCardReader(){
-  console.log('[Debug] initCardReader 被呼叫');
   // 建立 dots
   const dotsEl = document.getElementById('card-dots');
   dotsEl.innerHTML = CARDS_DATA.map((_,i)=>`<div class="card-dot" id="dot-${i}"></div>`).join('');
@@ -1313,6 +1312,8 @@ document.addEventListener('click', e=>{
 })();
 
 // 圖卡由 tryStart 觸發，不自動彈出
+// 初始化按鈕狀態
+updateBtn();
 </script>
 </body>
 </html>
