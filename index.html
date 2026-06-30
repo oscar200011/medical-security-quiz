@@ -260,7 +260,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="plan-tag">「健康台灣深耕計畫」</div>
     <h1 class="main-title">臺南愛（AI）腸篩<br>大腸癌擴篩完治 × AI轉診<br>智慧平台精進計畫</h1>
   </div>
-  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行圖卡閱讀，完成後自動開始考試</p>
+  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行前測 → 圖卡閱讀 → 後測</p>
 
   <div class="steps-bar">
     <div class="step-item">
@@ -270,12 +270,17 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="step-line" id="step-line1"></div>
     <div class="step-item">
       <div class="step-circle" id="step2-circle">2</div>
-      <div class="step-label" id="step2-label">閱讀圖卡</div>
+      <div class="step-label" id="step2-label">前測</div>
     </div>
     <div class="step-line" id="step-line2"></div>
     <div class="step-item">
       <div class="step-circle" id="step3-circle">3</div>
-      <div class="step-label" id="step3-label">開始考試</div>
+      <div class="step-label" id="step3-label">閱讀圖卡</div>
+    </div>
+    <div class="step-line" id="step-line3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="step4-circle">4</div>
+      <div class="step-label" id="step4-label">後測</div>
     </div>
   </div>
 
@@ -320,7 +325,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="quiz-layout">
     <div class="prog-overall"><div class="prog-overall-fill" id="qprog"></div></div>
     <div class="quiz-topbar">
-      <div class="q-counter">題目 <span id="qnum">1</span> / <span id="qtotal">10</span></div>
+      <div class="quiz-mode-badge" id="quiz-mode-badge" style="font-size:.85rem;font-weight:700;color:#0066cc;background:#e6f0ff;border:1px solid #0066cc;border-radius:6px;padding:.2rem .7rem;margin-right:.5rem;">前測</div>
+      <div class="q-counter" id="q-counter-wrap">題目 <span id="qnum">1</span> / <span id="qtotal">10</span></div>
       <div class="q-type-tag" id="qtype">主題</div>
       <div class="ans-count"><span id="anscount">0</span>/<span id="anstotal">10</span> 已作答</div>
     </div>
@@ -493,6 +499,8 @@ const CFG={
 };
 
 let qs=[],cur=0,ans={},vidProg=0,vidTimer=null,vidOK=true,regData={},lastScore=0,lastPassed=false;
+let quizMode='post'; // 'pre' = 前測, 'post' = 後測
+let preTestAns={}, preTestDone=false;
 
 (()=>{const c=document.getElementById('particles');for(let i=0;i<28;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.width=p.style.height=(1+Math.random()*2)+'px';c.appendChild(p);}})();
 
@@ -591,24 +599,29 @@ function tryStart(){
   regData={clinic:c,code:co,name:n,title:t};
   saveRecord();
   clearInterval(vidTimer);
-  // 步驟指示器：進入步驟2
+  // 步驟指示器：進入步驟2（前測）
   setStep(2);
-  // 每次考試前都先顯示圖卡
   cardsAllRead = false;
-  // 用 setTimeout 確保 Script 2（含 initCardReader）已載入
-  setTimeout(function(){
-    if(typeof initCardReader === 'function'){
-      for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
-      initCardReader();
-    } else {
-      // 直接顯示 overlay
-      document.getElementById('card-reader-overlay').style.display='flex';
-    }
-  }, 50);
+  preTestDone = false;
+  startPreTest();
+}
+
+function startPreTest(){
+  quizMode='pre';
+  const themeP=THEME_Q.slice(0,CFG.THEME_N);
+  const situP=SITU_Q.slice(0,CFG.SITU_N);
+  qs=[...themeP,...situP];
+  cur=0;ans={};
+  document.getElementById('qtotal').textContent=qs.length;
+  document.getElementById('quiz-mode-badge').textContent='前測';
+  document.getElementById('btnsubmit').textContent='繳交前測';
+  buildDots();
+  showScreen('quiz-screen');
+  renderQ();
 }
 
 function setStep(n){
-  for(let i=1;i<=3;i++){
+  for(let i=1;i<=4;i++){
     const circle = document.getElementById('step'+i+'-circle');
     const label  = document.getElementById('step'+i+'-label');
     const line   = document.getElementById('step-line'+i);
@@ -627,14 +640,30 @@ function setStep(n){
   }
 }
 
-function startQuiz(){
-  // 真正開始考試（由 finishCards 呼叫）
+function startCardReading(){
+  // 步驟指示器：進入步驟3（閱讀圖卡）
   setStep(3);
+  setTimeout(function(){
+    if(typeof initCardReader === 'function'){
+      for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
+      initCardReader();
+    } else {
+      document.getElementById('card-reader-overlay').style.display='flex';
+    }
+  }, 50);
+}
+
+function startQuiz(){
+  // 真正開始考試（由 finishCards 呼叫）= 後測
+  quizMode='post';
+  setStep(4);
   const themeP=THEME_Q.slice(0,CFG.THEME_N);
   const situP=SITU_Q.slice(0,CFG.SITU_N);
   qs=[...themeP,...situP];
   cur=0;ans={};
   document.getElementById('qtotal').textContent=qs.length;
+  document.getElementById('quiz-mode-badge').textContent='後測';
+  document.getElementById('btnsubmit').textContent='繳交答卷';
   buildDots();
   showScreen('quiz-screen');
   renderQ();
@@ -707,11 +736,53 @@ function selectAns(k){
 
 function confirmSubmit(){
   const unanswered=qs.length-Object.keys(ans).length;
+  if(quizMode==='pre'){
+    const msg=unanswered>0
+      ?`還有 ${unanswered} 題未作答，確定要繳交前測嗎？`
+      :'確定繳交前測？繳交後將進入圖卡閱讀。';
+    if(!confirm(msg))return;
+    finishPreTest();
+    return;
+  }
   const msg=unanswered>0
     ?`還有 ${unanswered} 題未作答，確定要繳交嗎？`
     :'確定繳交答卷？繳交後無法更改答案。';
   if(!confirm(msg))return;
   calcResult();
+}
+
+function finishPreTest(){
+  // 儲存前測作答紀錄，不計分顯示，直接進入圖卡閱讀
+  preTestAns = {...ans};
+  preTestDone = true;
+  playSound('submit');
+  syncPreTestToGSheet();
+  startCardReading();
+}
+
+function syncPreTestToGSheet(){
+  if(!CFG.GSHEET_URL||CFG.GSHEET_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL'){
+    return;
+  }
+  let correct=0;
+  qs.forEach((q,i)=>{if(preTestAns[i]===q.answer)correct++;});
+  const payload={
+    type:    'pretest',
+    token:   atob('dGFpbmFuLWFpLXF1aXotMjAyNQ=='),
+    name:    regData.name,
+    clinic:  regData.clinic,
+    code:    regData.code,
+    title:   regData.title,
+    correct: correct,
+    total:   qs.length,
+    userAns: preTestAns
+  };
+  fetch(CFG.GSHEET_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(r=>{}).catch(e=>{});
 }
 
 function calcResult(){
@@ -866,6 +937,7 @@ function restartAll(){
   // 重置考試狀態
   qs = []; ans = {}; cur = 0;
   cardsAllRead = false;
+  preTestAns = {}; preTestDone = false; quizMode='pre';
   // 重置問卷狀態
   Object.keys(surveyAns).forEach(k => delete surveyAns[k]);
   const survDone    = document.getElementById('survey-done');
