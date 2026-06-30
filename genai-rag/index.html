@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI輔助教學模組 M3 課後測驗 | 健康台灣深耕計畫</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@400;700&display=swap');
+:root{--bp:#1a6fc4;--bl:#ddeeff;--bm:#4a9de0;--bd:#0d4a8a;--bg:#e8f2fc;--w:#fff;--gt:#444;--gl:#f5f8fc;--br:#c5daf0;--ok:#2a9d5c;--er:#d0021b;--r:12px;--rs:8px;--sh:0 2px 12px rgba(26,111,196,.10);--fs:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;background:
+    radial-gradient(ellipse at 15% 30%, rgba(26,111,196,.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 10%, rgba(74,157,224,.16) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 75%, rgba(13,74,138,.12) 0%, transparent 45%),
+    linear-gradient(135deg,#c8dff5 0%,#daeaf8 30%,#cfe4f6 60%,#bdd4ee 100%);
+  background-attachment:fixed;color:var(--gt);min-height:100vh;font-size:var(--fs)}
+
+.br{display:flex;gap:8px;align-items:center}
+.bdg{border:1.5px solid var(--bp);color:var(--bp);border-radius:20px;padding:2px 12px;font-size:12px;font-weight:500}
+.hr{display:flex;align-items:center;gap:10px}
+.tmb{background:var(--bp);color:#fff;border-radius:16px;padding:3px 12px;font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.fsc{display:flex;align-items:center;gap:4px}
+.qnav{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--br)}
+.qnb{width:36px;height:36px;border-radius:var(--rs);border:1.5px solid var(--br);background:var(--w);color:var(--gt);font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:'Noto Sans TC',sans-serif}
+.qnb:hover{border-color:var(--bm);background:var(--bl)}
+.qnb.cur{background:var(--bp);border-color:var(--bp);color:#fff;box-shadow:0 2px 8px rgba(26,111,196,.3)}
+.qnb.done{background:var(--bl);border-color:var(--bp);color:var(--bp)}
+.fsb{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--br);background:var(--w);cursor:pointer;font-size:12px;font-weight:700;color:var(--bp);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.fsb:hover{background:var(--bl);border-color:var(--bp)}
+.fsl{font-size:11px;color:#88aacc;min-width:28px;text-align:center}
+.hero{
+  background:transparent;
+  text-align:center;padding:54px 20px 24px;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(26,111,196,.12) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.hero::after{content:'';position:absolute;top:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(26,111,196,.15) 0%,transparent 70%);pointer-events:none;animation:pulse 6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+.he{font-size:12px;color:var(--bd);font-weight:500;letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase;opacity:.8}
+.hero h1{font-family:'Noto Serif TC',serif;font-size:clamp(16px,2vw,26px);font-weight:700;color:var(--bd);line-height:1.45;margin-bottom:8px}
+.hero h1 em{font-style:normal;color:var(--bp)}
+.hs{font-size:13px;color:#4a6a99;margin-bottom:22px}
+.sb{display:flex;justify-content:center;align-items:flex-start}
+.st{display:flex;flex-direction:column;align-items:center;gap:5px}
+.sc{width:28px;height:28px;border-radius:50%;border:2px solid var(--bm);background:rgba(255,255,255,.6);color:var(--bm);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.st.active .sc{background:var(--bp);border-color:var(--bp);color:#fff;box-shadow:0 0 0 4px rgba(26,111,196,.18)}
+.st.done .sc{background:var(--ok);border-color:var(--ok);color:#fff}
+.sl{font-size:10px;color:#6688aa;font-weight:500}
+.st.active .sl{color:var(--bp);font-weight:700}
+.sline{width:44px;height:2px;background:rgba(26,111,196,.2);margin-top:13px}
+.con{max-width:900px;margin:0 auto;padding:24px 24px 60px}
+.card{background:rgba(255,255,255,.97);border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.18),0 2px 12px rgba(26,111,196,.12);border:1px solid rgba(255,255,255,.8);padding:32px;margin-bottom:16px}
+.ct{font-size:12px;color:var(--bp);font-weight:700;letter-spacing:.08em;border-bottom:2px solid var(--bl);padding-bottom:8px;margin-bottom:16px}
+.ct::before{content:"// ";opacity:.5}
+.fg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fc{grid-column:1/-1}
+.fl label{display:block;font-size:calc(var(--fs) - 2px);font-weight:700;color:var(--bd);margin-bottom:5px}
+.req{color:var(--er);margin-left:2px}
+.fl input,.fl select{width:100%;height:40px;border:1.5px solid var(--br);border-radius:var(--rs);padding:0 12px;font-size:var(--fs);font-family:'Noto Sans TC',sans-serif;color:var(--gt);background:var(--w);outline:none;transition:border-color .2s,box-shadow .2s}
+.fl input:focus,.fl select:focus{border-color:var(--bp);box-shadow:0 0 0 3px rgba(26,111,196,.12)}
+.fl input::placeholder{color:#aac0d8}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 22px;border-radius:21px;font-family:'Noto Sans TC',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s}
+.bp{background:var(--bp);color:#fff;box-shadow:0 4px 14px rgba(26,111,196,.28)}
+.bp:hover{background:var(--bd);transform:translateY(-1px)}
+.bo{background:transparent;color:var(--bp);border:2px solid var(--bp)}
+.bo:hover{background:var(--bl)}
+.bk{background:var(--ok);color:#fff;box-shadow:0 4px 14px rgba(42,157,92,.28)}
+.bk:hover{background:#22854d}
+.bc{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.ub{background:rgba(255,255,255,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);border-radius:var(--rs);padding:8px 16px;font-size:var(--fs);color:var(--bd);display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ub strong{color:var(--bp)}
+.ib{background:rgba(221,238,255,.6);border:1px solid rgba(197,218,240,.7);border-radius:var(--rs);padding:10px 16px;font-size:13px;color:var(--bd);display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.dn{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.dds{display:flex;gap:8px;align-items:center}
+.dd{width:30px;height:5px;border-radius:3px;background:var(--br);transition:background .3s}
+.dd.active{background:var(--bp)}
+.dd.done{background:var(--ok)}
+.dtg{font-size:12px;color:var(--bp);font-weight:700;background:var(--bl);padding:3px 12px;border-radius:12px}
+.rpb{height:4px;background:var(--br);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.rpf{height:100%;background:linear-gradient(90deg,var(--bp),var(--bm));border-radius:2px;transition:width .4s ease}
+.rpt{font-size:11px;color:#88aacc;text-align:right;margin-bottom:8px}
+.rsa{max-height:440px;overflow-y:auto;padding-right:6px;scrollbar-width:thin;scrollbar-color:var(--bm) var(--bl)}
+.rsa::-webkit-scrollbar{width:5px}
+.rsa::-webkit-scrollbar-track{background:var(--bl);border-radius:3px}
+.rsa::-webkit-scrollbar-thumb{background:var(--bm);border-radius:3px}
+.rc{line-height:1.9;color:#333;font-size:var(--fs)}
+.rc h2{font-family:'Noto Serif TC',serif;font-size:calc(var(--fs) + 2px);color:var(--bd);margin:20px 0 10px;padding-left:12px;border-left:4px solid var(--bp)}
+.rc h3{font-size:calc(var(--fs) - 1px);color:var(--bp);margin:14px 0 6px;font-weight:700}
+.rc p{margin-bottom:10px}
+.rc ul{padding-left:18px;margin-bottom:10px}
+.rc ul li{margin-bottom:5px}
+.hl{background:var(--bl);border-radius:4px;padding:1px 5px;color:var(--bd);font-weight:700}
+.box{background:var(--gl);border:1px solid var(--br);border-radius:var(--rs);padding:13px 17px;margin:11px 0}
+.bt{font-weight:700;color:var(--bp);font-size:calc(var(--fs) - 2px);margin-bottom:6px}
+.sdm{background:linear-gradient(135deg,#eafaf1,#d4f4e3);border:1px solid #80d4a8;border-radius:var(--rs);padding:10px 16px;font-size:13px;color:#1a6644;margin-top:12px;display:none;align-items:center;gap:8px}
+.qh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.qc{font-size:13px;color:#88aacc;font-weight:500}
+.qa2{font-size:13px;color:var(--bp);font-weight:700}
+.qp{height:6px;background:var(--br);border-radius:3px;margin-bottom:22px;overflow:hidden}
+.qpf{height:100%;background:linear-gradient(90deg,var(--bp),var(--bm));border-radius:3px;transition:width .4s}
+.qt{font-size:var(--fs);font-weight:700;color:var(--bd);line-height:1.6;margin-bottom:16px}
+.qn{display:inline-block;background:var(--bp);color:#fff;border-radius:6px;padding:1px 9px;font-size:12px;font-weight:700;margin-right:8px;vertical-align:middle}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:11px 15px;border:2px solid var(--br);border-radius:var(--rs);cursor:pointer;transition:all .18s;background:var(--w);user-select:none}
+.opt:hover{border-color:var(--bm);background:var(--bl)}
+.opt.sel{border-color:var(--bp);background:var(--bl)}
+.ok2{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:2px solid var(--br);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#88aacc;transition:all .18s}
+.opt.sel .ok2{border-color:var(--bp);color:var(--bp)}
+.ot{font-size:var(--fs);line-height:1.5;padding-top:2px}
+.rh{text-align:center;padding:22px 16px 16px}
+.rc2{width:120px;height:120px;border-radius:50%;margin:0 auto 14px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.rcp{background:radial-gradient(circle at 40% 40%,#4caf87,#2a9d5c);box-shadow:0 8px 28px rgba(42,157,92,.3)}
+.rcf{background:radial-gradient(circle at 40% 40%,#e67e22,#c0392b);box-shadow:0 8px 26px rgba(192,57,43,.28)}
+.rsn2{font-size:40px;font-weight:900;color:#fff;line-height:1}
+.rd{font-size:14px;color:rgba(255,255,255,.85);font-weight:500}
+.rti{font-family:'Noto Serif TC',serif;font-size:19px;font-weight:700;color:var(--bd);margin-bottom:6px}
+.rsu{font-size:13px;color:#88aacc}
+.rg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+.rst{text-align:center;padding:13px;background:var(--gl);border-radius:var(--rs);border:1px solid var(--br)}
+.rsn{font-size:21px;font-weight:900;color:var(--bp)}
+.rsl{font-size:11px;color:#88aacc;margin-top:2px}
+.bi{display:flex;align-items:flex-start;gap:8px;padding:10px 0;border-bottom:1px solid var(--br);font-size:13px}
+.bi:last-child{border-bottom:none}
+.bico{font-size:15px;flex-shrink:0;margin-top:1px}
+.bq{flex:1;color:#555;line-height:1.5}
+.btgl{border:1.5px solid var(--br);background:var(--w);color:var(--bp);border-radius:var(--rs);padding:2px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans TC',sans-serif;transition:all .2s;white-space:nowrap;display:inline-block;margin-top:4px}
+.btgl:hover{background:var(--bl);border-color:var(--bp)}
+.bexp{background:var(--gl);border-left:3px solid var(--bp);border-radius:0 6px 6px 0;padding:9px 13px;margin:6px 0 2px 24px;font-size:12px;color:#444;line-height:1.7;display:none}
+.bexp.show{display:block}
+.bexp strong{color:var(--bp)}
+.sq{margin-bottom:22px}
+.sqt{font-size:14px;font-weight:700;color:var(--bd);margin-bottom:10px}
+.stars{display:flex;gap:8px;margin-bottom:6px}
+.star{font-size:26px;cursor:pointer;transition:transform .15s;color:#ddd;line-height:1}
+.star.lit{color:#f5a623}
+.star:hover{transform:scale(1.15)}
+.srg{display:flex;flex-direction:column;gap:8px}
+.sr{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--br);border-radius:var(--rs);cursor:pointer;transition:all .2s;font-size:13px}
+.sr:hover{border-color:var(--bm);background:var(--bl)}
+.sr.sel{border-color:var(--bp);background:var(--bl);font-weight:700}
+.sr input{accent-color:var(--bp);width:16px;height:16px;flex-shrink:0}
+.sta{width:100%;border:1.5px solid var(--br);border-radius:var(--rs);padding:10px 12px;font-size:13px;font-family:'Noto Sans TC',sans-serif;color:var(--gt);resize:vertical;min-height:80px;outline:none;transition:border-color .2s}
+.sta:focus{border-color:var(--bp);box-shadow:0 0 0 3px rgba(26,111,196,.12)}
+.dw{text-align:center;padding:40px 20px}
+.di{font-size:58px;margin-bottom:14px}
+.dw h2{font-family:'Noto Serif TC',serif;font-size:21px;color:var(--bd);margin-bottom:8px}
+.dw p{font-size:14px;color:#88aacc}
+.screen{display:none}
+.screen.active{display:block}
+.wrap2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.page-center{display:flex;flex-direction:column;align-items:center;padding:28px 32px 48px;max-width:1200px;margin:0 auto;width:100%}
+.wrap3{display:grid;grid-template-columns:3fr 2fr;gap:20px;align-items:stretch}
+.hero-inner{max-width:860px;margin:0 auto;width:100%}
+@media(max-width:900px){.wrap2,.wrap3{grid-template-columns:1fr}}
+
+/* ── Slideshow ── */
+.slideshow-wrap{position:relative;background:rgba(255,255,255,.95);border-radius:var(--r);box-shadow:0 4px 24px rgba(26,111,196,.13);border:1px solid var(--br);display:flex;flex-direction:column}
+.slide{width:100%;flex-direction:column;justify-content:flex-start;padding:0;flex-shrink:0}
+.slide-inner{padding:24px 28px 16px;height:440px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bm) var(--bl)}
+.slide-inner::-webkit-scrollbar{width:4px}
+.slide-inner::-webkit-scrollbar-thumb{background:var(--bm);border-radius:2px}
+.sl-unit{font-size:calc(var(--fs) - 3px);color:var(--bm);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.sl-title{font-family:'Noto Serif TC',serif;font-size:calc(var(--fs) + 3px);font-weight:700;color:var(--bd);line-height:1.3}
+.sl-sub{font-size:calc(var(--fs) - 2px);color:#5577aa;line-height:1.5;margin-bottom:2px}
+.slide-body{display:flex;flex-direction:column;justify-content:flex-start;margin-top:4px;flex:1}
+.sl-note{background:rgba(255,248,225,.9);border-left:3px solid #f5a623;border-radius:0 6px 6px 0;padding:6px 12px;font-size:calc(var(--fs) - 2px);color:#7a5c00;margin-top:6px;line-height:1.5}
+/* Nav */
+.sl-nav{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--gl);border-top:1px solid var(--br);border-radius:0 0 var(--r) var(--r)}
+/* Two column */
+.sl-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+.sl-col{border-radius:8px;padding:10px 14px;border:1px solid rgba(26,111,196,.15);display:flex;flex-direction:column;gap:6px}
+.sl-col-title{font-weight:700;font-size:calc(var(--fs) - 1px);margin-bottom:4px}
+.sl-col-item{font-size:calc(var(--fs) - 2px);color:#444;line-height:1.5;padding:2px 0 2px 8px;border-left:2px solid rgba(26,111,196,.2)}
+/* Steps */
+.sl-steps{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.sl-step{display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,.8);border-radius:8px;padding:10px 12px;border:1px solid var(--br)}
+.sl-step-num{flex-shrink:0;width:32px;height:32px;border-radius:50%;background:var(--bp);color:#fff;font-weight:700;font-size:calc(var(--fs));display:flex;align-items:center;justify-content:center}
+.sl-step-title{font-weight:700;color:var(--bd);font-size:calc(var(--fs) - 1px);margin-bottom:3px}
+.sl-step-text{font-size:calc(var(--fs) - 2px);color:#444;line-height:1.5}
+/* Grid 4 */
+.sl-grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sl-card{background:rgba(255,255,255,.8);border-radius:8px;padding:10px 12px;border:1px solid var(--br)}
+.sl-card-num{font-size:calc(var(--fs) + 2px);font-weight:900;color:var(--bp);margin-bottom:2px}
+.sl-card-title{font-weight:700;color:var(--bd);font-size:calc(var(--fs) - 1px)}
+.sl-card-sub{font-size:calc(var(--fs) - 3px);color:var(--bm);margin-bottom:4px}
+.sl-card-text{font-size:calc(var(--fs) - 2px);color:#444;line-height:1.6}
+/* CREATE */
+.sl-create-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sl-create-item{display:flex;align-items:flex-start;gap:8px;background:rgba(255,255,255,.8);border-radius:8px;padding:8px 10px;border:1px solid var(--br)}
+.sl-create-letter{flex-shrink:0;width:30px;height:30px;border-radius:50%;background:var(--bd);color:#fff;font-weight:900;font-size:calc(var(--fs) + 2px);display:flex;align-items:center;justify-content:center}
+.sl-create-title{font-weight:700;color:var(--bd);font-size:calc(var(--fs) - 1px)}
+.sl-create-text{font-size:calc(var(--fs) - 2px);color:#555;line-height:1.5;margin-top:2px}
+/* Cover */
+.sl-cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:8px}
+.sl-cover-box{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:12px 14px;font-size:calc(var(--fs) - 1px);color:rgba(255,255,255,.9);line-height:1.5}
+.sl-footer{font-size:calc(var(--fs) - 3px);color:rgba(255,255,255,.5);margin-top:auto;text-align:center;padding-top:8px}
+/* Map */
+.sl-map-col{border-radius:8px;padding:14px 16px}
+.sl-map-left{background:rgba(26,111,196,.08);border:1px solid rgba(26,111,196,.2)}
+.sl-map-right{background:rgba(42,157,92,.08);border:1px solid rgba(42,157,92,.2)}
+.sl-map-title{font-weight:700;font-size:calc(var(--fs) - 1px);color:var(--bd);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(26,111,196,.15)}
+.sl-map-item{font-size:calc(var(--fs) - 2px);color:#444;padding:3px 0;line-height:1.5}
+/* Section */
+.sl-section-text{font-size:calc(var(--fs) - 1px);color:#444;line-height:1.8;padding:16px 20px;background:rgba(255,255,255,.15);border-radius:8px;border:1px solid rgba(255,255,255,.3)}
+/* Summary */
+.sl-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:4px}
+.sl-sum-card{background:rgba(255,255,255,.8);border-radius:8px;padding:10px 14px;border:1px solid var(--br)}
+.sl-sum-step{font-size:calc(var(--fs) - 3px);color:var(--bm);font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.sl-sum-title{font-weight:700;color:var(--bd);font-size:calc(var(--fs) - 1px);margin-bottom:6px}
+.sl-sum-text{font-size:calc(var(--fs) - 2px);color:#444;line-height:1.6}
+/* Nav bar */
+.sl-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--gl);border-top:1px solid var(--br)}
+.sl-dots{display:flex;gap:5px;align-items:center}
+.sl-dot{width:7px;height:7px;border-radius:50%;background:var(--br);transition:all .2s;cursor:pointer}
+.sl-dot.on{background:var(--bp);width:18px;border-radius:4px}
+.sl-btn{height:34px;padding:0 16px;border-radius:17px;border:none;font-family:'Noto Sans TC',sans-serif;font-size:calc(var(--fs) - 2px);font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.sl-btn-prev{background:transparent;color:var(--bp);border:1.5px solid var(--bp)}
+.sl-btn-prev:hover{background:var(--bl)}
+.sl-btn-next{background:var(--bp);color:#fff;box-shadow:0 3px 10px rgba(26,111,196,.3)}
+.sl-btn-next:hover{background:var(--bd)}
+.sl-btn:disabled{opacity:.3;cursor:default;transform:none!important;box-shadow:none}
+.sl-counter{font-size:calc(var(--fs) - 2px);color:#88aacc;font-weight:500;min-width:60px;text-align:center}
+/* Cover slide special */
+.slide-cover .slide-inner{background:linear-gradient(135deg,#0d2240,#1a6fc4);color:#fff;border-radius:var(--r);justify-content:center}
+.slide-cover .sl-title{color:#fff;font-size:calc(var(--fs) + 8px)}
+.slide-cover .sl-sub{color:rgba(255,255,255,.8)}
+.slide-cover .sl-unit{color:rgba(160,200,255,.7)}
+/* Section slide */
+.slide-section .slide-inner{background:linear-gradient(135deg,#1a6fc4,#2a9d5c);justify-content:center}
+.slide-section .sl-title{color:#fff;font-size:calc(var(--fs) + 6px)}
+.slide-section .sl-sub{color:rgba(255,255,255,.85)}
+.slide-section .sl-unit{color:rgba(160,200,255,.7)}
+.slide-section .sl-section-text{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.2);color:#fff}
+@media(max-width:600px){.sl-two-col,.sl-grid4,.sl-create-grid,.sl-grid3{grid-template-columns:1fr}}
+
+@media(max-width:600px){.fg{grid-template-columns:1fr}.rg{grid-template-columns:1fr 1fr}.card{padding:18px 13px}.dn{gap:6px}}
+</style>
+</head>
+<body>
+
+
+
+<div class="hero">
+<div style="position:absolute;top:16px;right:24px;display:flex;align-items:center;gap:10px;z-index:10">
+  <div class="fsc">
+    <button class="fsb" onclick="afs(-1)" style="border-color:var(--br);background:rgba(255,255,255,.7);color:var(--bp)">A-</button>
+    <span class="fsl" id="fsl" style="color:#6688aa">預設</span>
+    <button class="fsb" onclick="afs(1)" style="border-color:var(--br);background:rgba(255,255,255,.7);color:var(--bp)">A+</button>
+  </div>
+  <span class="tmb" id="tmb" style="display:none;background:var(--bp)">⏱ <span id="tmv">20:00</span></span>
+</div>
+<div style="position:absolute;top:18px;left:24px;z-index:10">
+  <span style="border:1.5px solid var(--bp);color:var(--bp);border-radius:20px;padding:3px 14px;font-size:12px;font-weight:500;background:rgba(255,255,255,.6)">健康台灣深耕計畫</span>
+</div>
+<div class="hero-inner">
+  <div class="he">「健康台灣深耕計畫」</div>
+  <h1>臺南愛（AI）腸篩<br>大腸癌擴篩完治 × AI轉診<br><em>智慧平台精進計畫</em></h1>
+  <p class="hs">GenAI × RAG 基礎概念認證測驗　｜　填寫資料 → 閱讀講義 → 考試 → 問卷</p>
+  <div class="sb">
+    <div class="st active" id="sp1"><div class="sc">1</div><div class="sl">填寫資料</div></div>
+    <div class="sline"></div>
+    <div class="st" id="sp2"><div class="sc">2</div><div class="sl">前測</div></div>
+    <div class="sline"></div>
+    <div class="st" id="sp3"><div class="sc">3</div><div class="sl">閱讀講義</div></div>
+    <div class="sline"></div>
+    <div class="st" id="sp4"><div class="sc">4</div><div class="sl">後測</div></div>
+    <div class="sline"></div>
+    <div class="st" id="sp5"><div class="sc">5</div><div class="sl">課後問卷</div></div>
+  </div>
+
+
+<!-- STEP 1 -->
+<div class="screen active" id="scReg">
+<div class="page-center">
+<div style="max-width:640px;width:100%;margin:0 auto">
+  <div class="card">
+    <div class="ct">考生資料登錄</div>
+    <div class="fg">
+      <div class="fl fc">
+        <label>診所名稱（全名）<span class="req">*</span></label>
+        <input type="text" id="fCl" placeholder="例：臺南市安南區某某診所">
+      </div>
+      <div class="fl">
+        <label>機構代碼<span class="req">*</span></label>
+        <input type="text" id="fOr" placeholder="例：3301234567">
+      </div>
+      <div class="fl">
+        <label>姓名<span class="req">*</span></label>
+        <input type="text" id="fNm" placeholder="請輸入真實姓名">
+      </div>
+      <div class="fl">
+        <label>職稱<span class="req">*</span></label>
+        <select id="fTi">
+          <option value="">── 請選擇職稱 ──</option>
+          <option>醫師</option><option>護理師</option><option>醫事放射師</option>
+          <option>藥師</option><option>醫療資訊人員</option><option>行政人員</option>
+          <option>專案管理師</option><option>其他醫事人員</option>
+        </select>
+      </div>
+    </div>
+    <div id="rErr" style="color:var(--er);font-size:13px;margin-top:10px;display:none">⚠ 請填寫所有必填欄位</div>
+    <div class="bc"><button class="btn bp" onclick="subReg()">下一步 →</button></div>
+  </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- REST -->
+<div class="con">
+
+<!-- STEP 2: 前測 -->
+<div class="screen" id="scPre">
+  <div class="ub" id="ubPre"></div>
+  <div class="card">
+    <div class="ct">課前前測</div>
+    <div class="ib" style="background:rgba(255,248,225,.8);border-color:#f5a623;color:#7a5c00">
+      📋 請根據您目前的理解作答，不需要查資料，答錯也沒關係！前測結果僅供參考，不計入成績。
+    </div>
+    <div class="qh">
+      <span class="qc" id="preQcnt">第 1 題，共 10 題</span>
+      <span class="qa2" id="preQans">已答：0 題</span>
+    </div>
+    <div class="qp"><div class="qpf" id="preQpf" style="width:0%"></div></div>
+    <div id="preQa"></div>
+    <div class="bc">
+      <button class="btn bo" id="preBPrev" onclick="prevPreQ()" style="display:none">← 上一題</button>
+      <button class="btn bp" id="preBNext" onclick="nextPreQ()" style="display:none">下一題 →</button>
+      <button class="btn bk" id="preBSub" onclick="submitPre()" style="display:none">完成前測，開始閱讀 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="scRd">
+  <div class="ub" id="ub1"></div>
+  <div class="card">
+    <div class="ct">課前教材閱讀</div>
+    <div class="ib">📖 請先完整閱讀必讀教材後才能進入考試。延伸閱讀可隨時展開，不影響考試資格。</div>
+
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <span style="background:var(--bp);color:#fff;border-radius:20px;padding:3px 14px;font-size:12px;font-weight:700">必讀教材</span>
+      <span style="font-size:13px;color:var(--bd);font-weight:700">進入 AI 新紀元：認識生成式 AI × RAG 與 NotebookLM</span>
+      <span style="margin-left:auto;font-size:12px;color:#88aacc">共 15 頁</span>
+    </div>
+    <div class="slideshow-wrap" id="slideshow">
+      <!-- slides -->
+      <div class="slide slide-cover" id="slide1" style="display:flex">
+  <div class="slide-inner">
+    <div class="sl-title">進入 AI 新紀元</div><div class="sl-sub">認識生成式 AI × 用 RAG 與 NotebookLM 打造專屬助理</div>
+    <div class="slide-body"><div class="sl-cover-grid"><div class="sl-cover-box"><strong>01 看懂它</strong><br>用最白話的方式，認識生成式 AI 在做什麼、能怎麼幫你製作教材。</div><div class="sl-cover-box"><strong>02 用得準</strong><br>學會 RAG 與 NotebookLM，讓 AI 只依你的資料回答、不再亂講話。</div></div><div class="sl-footer">臺南市醫師公會・健康台灣深耕計畫</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide2" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">課程地圖・COURSE MAP</div><div class="sl-title">本講義分成兩個單元</div><div class="sl-sub">為臨床繁忙的您設計 — 不談艱深技術，只談看得懂、用得上的重點。建議依序閱讀。</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-map-col sl-map-left"><div class="sl-map-title">單元一・M3-1　生成式 AI 基礎</div><div class="sl-map-item">· 傳統 AI 與生成式 AI 的差別</div><div class="sl-map-item">· AI 的運作原理：「文字接龍」</div><div class="sl-map-item">· 四大能力：生成、摘要、轉換、發想</div><div class="sl-map-item">· 提示詞工程：CREATE 框架與實戰</div></div><div class="sl-map-col sl-map-right"><div class="sl-map-title">單元二・M3-2　RAG 與 NotebookLM</div><div class="sl-map-item">· 為什麼 AI 會「胡說八道」</div><div class="sl-map-item">· RAG 原理：天才醫師與超強助理</div><div class="sl-map-item">· RAG 三步驟：檢索、增強、生成</div><div class="sl-map-item">· 動手用 NotebookLM 打造專屬助理</div></div></div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide3" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一・生成式 AI 基礎</div><div class="sl-title">從「判別」到「生成」：AI 的革命</div><div class="sl-sub">一句話看懂差別：過去的 AI 從選項中「找答案」，現在的 AI 能「創造」全新內容</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-col" style="background:rgba(255,255,255,.7);border-color:rgba(26,111,196,.15)"><div class="sl-col-title" style="color:var(--bp)">傳統 AI・嚴格的「分類員」</div><div class="sl-col-item">判別式 AI（Discriminative AI）</div><div class="sl-col-item">強項是「找規律、做分類」</div><div class="sl-col-item">例：判讀十萬張 X 光片後，能準確分辨新片子正常或異常</div><div class="sl-col-item">工作核心：從既有選項中找出正確答案或機率</div><div class="sl-col-item">不會「創造」資料庫裡不存在的東西</div></div><div class="sl-col" style="background:rgba(255,255,255,.7);border-color:rgba(26,111,196,.15)"><div class="sl-col-title" style="color:var(--bp)">生成式 AI・有創意的「創作者」</div><div class="sl-col-item">生成式 AI（Generative AI）</div><div class="sl-col-item">跨越判別界線，擁有「創造」的能力</div><div class="sl-col-item">例：請它寫一封婉拒廠商報價的信，當下生成全新內容</div><div class="sl-col-item">不是去搜尋現成答案複製貼上，而是即時「生成」</div><div class="sl-col-item">像一個能溝通、能共同創作的聰明大腦</div></div></div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide4" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一・生成式 AI 基礎</div><div class="sl-title">超級大腦是怎麼運作的？</div><div class="sl-sub">大型語言模型（LLM）其實是在玩一個您小時候也玩過的遊戲 —「文字接龍」</div>
+    <div class="slide-body"><div class="sl-steps"><div class="sl-step"><div class="sl-step-num">①</div><div><div class="sl-step-title">海量閱讀</div><div class="sl-step-text">出廠前，AI 讀過維基百科、新聞、科學期刊等龐大資料，從中學習「字詞接續出現的機率」。</div></div></div><div class="sl-step"><div class="sl-step-num">②</div><div><div class="sl-step-title">計算機率</div><div class="sl-step-text">看到「祝你生日」時，它算出下一個字是「快」的機率高達 99%、是「蘋」只有 0.001%，於是輸出「快」。</div></div></div><div class="sl-step"><div class="sl-step-num">③</div><div><div class="sl-step-title">逐字生成</div><div class="sl-step-text">靠千億個參數，一個字一個字「接」下去，最後組成一篇流暢的衛教文章。</div></div></div></div><div class="sl-note">💡 關鍵理解：AI 不是真的「懂」內容，而是算出最合理的文字組合 — 這正是它有時會「一本正經說錯話」的原因。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide5" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一・生成式 AI 基礎</div><div class="sl-title">生成式 AI 的四大「超能力」</div><div class="sl-sub">這四項，正是您製作衛教教材、整理資料時最常用到的能力</div>
+    <div class="slide-body"><div class="sl-grid4"><div class="sl-card"><div class="sl-card-num">①</div><div class="sl-card-title">內容生成 Generation</div><div class="sl-card-sub">從 0 到 1 的創造</div><div class="sl-card-text">給幾個關鍵字（時間、預算、目標），幾秒內生成一份結構完整的計畫書草稿。</div></div><div class="sl-card"><div class="sl-card-num">②</div><div class="sl-card-title">資訊摘要 Summarization</div><div class="sl-card-sub">一秒讀完長篇大論</div><div class="sl-card-text">把 30 頁全英文的營養介入指引，濃縮成 500 字中文摘要與三大重點。</div></div><div class="sl-card"><div class="sl-card-num">③</div><div class="sl-card-title">語氣轉換 Transformation</div><div class="sl-card-sub">完美的翻譯官</div><div class="sl-card-text">把艱澀的病歷或檢驗報告，改寫成國中生也看得懂的衛教單張語氣。</div></div><div class="sl-card"><div class="sl-card-num">④</div><div class="sl-card-title">創意發想 Brainstorming</div><div class="sl-card-sub">不疲倦的點子王</div><div class="sl-card-text">請它給 10 個一萬元內、有互動性的社區大腸癌篩檢推廣點子。</div></div></div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide6" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一・提示詞工程</div><div class="sl-title">學會下指令：CREATE 框架</div><div class="sl-sub">「你怎麼問，決定了你得到什麼」— 只要記住這六個字母，就能精準指揮 AI</div>
+    <div class="slide-body"><div class="sl-create-grid"><div class="sl-create-item"><div class="sl-create-letter">C</div><div><div class="sl-create-title">Context 背景</div><div class="sl-create-text">交代現在的狀況與前因後果。</div></div></div><div class="sl-create-item"><div class="sl-create-letter">R</div><div><div class="sl-create-title">Role 角色</div><div class="sl-create-text">給 AI 一個專家身分（如：資深公衛護理師）。</div></div></div><div class="sl-create-item"><div class="sl-create-letter">E</div><div><div class="sl-create-title">Exact Task 任務</div><div class="sl-create-text">明確說出你要它完成什麼工作。</div></div></div><div class="sl-create-item"><div class="sl-create-letter">A</div><div><div class="sl-create-title">Action / Format 格式</div><div class="sl-create-text">指定答案長相：表格、條列、或限字數。</div></div></div><div class="sl-create-item"><div class="sl-create-letter">T</div><div><div class="sl-create-title">Tone 語氣</div><div class="sl-create-text">希望它用什麼態度說話（親切、專業）。</div></div></div><div class="sl-create-item"><div class="sl-create-letter">E</div><div><div class="sl-create-title">Examples 範例與限制</div><div class="sl-create-text">給參考句型，或指定要避開的字眼。</div></div></div></div><div class="sl-note">💡 小提示：框架不是死規定。另有 CLEAR 等口訣，但核心都一樣 —「背景、角色、任務、格式、限制」，記住精神即可。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide7" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一・提示詞工程</div><div class="sl-title">實戰對比：差一句話，差很多</div><div class="sl-sub">同樣要推廣大腸癌篩檢，兩種問法得到的結果天差地別</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-col" style="background:#fdecea;border-color:#f5c6c6"><div class="sl-col-title" style="color:var(--er)">✕ 糟糕的提示詞</div><div class="sl-col-item">「幫我寫一篇推廣大腸癌篩檢的文章。」</div><div class="sl-col-item">結果：AI 寫出官腔、無聊、像翻譯腔的文章，對工作幾乎沒幫助。</div></div><div class="sl-col" style="background:#eafaf1;border-color:#a3d9b1"><div class="sl-col-title" style="color:var(--ok)">✓ 優質的提示詞（套用 CREATE 框架）</div><div class="sl-col-item">（C 背景）我在地方衛生局當專案助理，本月目標是提升轄區 45–74 歲民眾的篩檢率。</div><div class="sl-col-item">（R 角色）請你扮演有 10 年經驗、了解長輩心理的社區公衛推廣專家。</div><div class="sl-col-item">（E 任務）幫我寫一篇要發在 Facebook 的宣傳貼文，控制在 300 字以內，結尾條列 3 個 Q&A。</div><div class="sl-col-item">（A 格式）條列式，300 字以內。</div><div class="sl-col-item">（T 語氣）親切幽默，像跟鄰居長輩聊天。</div><div class="sl-col-item">（E 範例）開場用「各位阿公阿嬤呷飽未？」，避開「開刀」、「癌症末期」等字眼。</div><div class="sl-col-item">結果：AI 的回答幾乎可以直接複製貼上使用，工作效率大幅提升。</div></div></div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide8" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元一 → 單元二・橋接</div><div class="sl-title">天才也有罩門：三大弱點</div><div class="sl-sub">了解極限，才能安全使用 — 這三點，正是下一個單元「RAG」要解決的核心問題</div>
+    <div class="slide-body"><div class="sl-steps"><div class="sl-step"><div class="sl-step-num">①</div><div><div class="sl-step-title">資訊有「時間差」</div><div class="sl-step-text">AI 的知識停在被訓練的那一刻。問它最新的醫療法規或補助方案，可能一無所知或給過時答案。</div></div></div><div class="sl-step"><div class="sl-step-num">②</div><div><div class="sl-step-title">缺乏「專屬」知識</div><div class="sl-step-text">AI 只讀過公開資料，沒看過你院內的 SOP、內部排班、機密企劃，自然答不出來。</div></div></div><div class="sl-step"><div class="sl-step-num">③</div><div><div class="sl-step-title">會有「AI 幻覺」</div><div class="sl-step-text">遇到不懂的問題，它可能不承認「不知道」，反而一本正經編造看似可信卻錯誤的答案 — 在醫療領域風險極高。</div></div></div></div><div class="sl-note">💡 解方就在下一單元：科學家不是把 AI 打掉重練，而是發明了一套協作機制 — RAG（檢索增強生成）。</div></div>
+    
+  </div>
+</div>
+<div class="slide slide-section" id="slide9" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・M3-2・UNIT TWO</div><div class="sl-title">RAG 與 NotebookLM</div><div class="sl-sub">讓 AI 成為精準、不亂講話的專業助手</div>
+    <div class="slide-body"><div class="sl-section-text">接下來，我們要解決上一個單元提到的三大弱點 — 用一套叫做 RAG 的方法，再加上一個免寫程式的免費工具「NotebookLM」，把 AI 變成只根據你提供的資料來回答的專屬助理。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide10" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・RAG 核心概念</div><div class="sl-title">天才醫師與他的超強助理</div><div class="sl-sub">用一個生活化的比喻，一次看懂 RAG（檢索增強生成）到底在做什麼</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-col" style="background:rgba(255,255,255,.7);border-color:rgba(26,111,196,.15)"><div class="sl-col-title" style="color:var(--bp)">純生成式 AI ＝ 天才醫師</div><div class="sl-col-item">名校第一名畢業，腦中裝滿公開的醫學知識</div><div class="sl-col-item">廣泛的健康常識，他都能對答如流</div><div class="sl-col-item">但你問他「院內昨天才發布的最新規範」，他答不出來</div><div class="sl-col-item">因為他的大腦裡根本沒有這份剛出爐的文件</div><div class="sl-col-item">硬要回答，就會「幻覺」— 拿別家醫院的規定來敷衍你</div></div><div class="sl-col" style="background:#eafaf1;border-color:#a3d9b1"><div class="sl-col-title" style="color:var(--ok)">RAG ＝ 幫醫師配一位超強助理</div><div class="sl-col-item">一位「擁有專屬檔案室鑰匙」的助理</div><div class="sl-col-item">你一提問，助理立刻去檔案室翻出那份最新文件</div><div class="sl-col-item">把相關段落連同你的問題，一起遞給醫師</div><div class="sl-col-item">醫師讀完這份正確資料，再用專業又流暢的話回答你</div><div class="sl-col-item">醫師不必重新讀書，就能精準回答最新、最機密的問題</div></div></div><div class="sl-note">💡 核心精神：不改變 AI 的大腦，而是給它一本「隨時更新的參考書」。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide11" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・RAG 運作原理</div><div class="sl-title">拆解 RAG 的三個步驟</div><div class="sl-sub">RAG ＝ Retrieval（檢索）＋ Augmented（增強）＋ Generation（生成）</div>
+    <div class="slide-body"><div class="sl-steps"><div class="sl-step"><div class="sl-step-num">R</div><div><div class="sl-step-title">檢索 Retrieval</div><div class="sl-step-text">助理去檔案室找資料。系統先在你的專屬知識庫（公衛公告、企劃書、產品手冊…）中，撈出和問題最相關的段落。</div></div></div><div class="sl-step"><div class="sl-step-num">A</div><div><div class="sl-step-title">增強 Augmented</div><div class="sl-step-text">提供補充教材。把你的「問題」和剛找到的「參考資料」打包在一起，像貼上便利貼，一併交給 AI。</div></div></div><div class="sl-step"><div class="sl-step-num">G</div><div><div class="sl-step-title">生成 Generation</div><div class="sl-step-text">AI 當整理者。根據這些參考資料，用人聽得懂的話把答案組織出來 — 因為有憑有據，就不會憑空捏造。</div></div></div></div><div class="sl-note">💡 一句話記住：一般 AI 像「閉卷考」全憑記憶作答；RAG 則是讓 AI 參加有標準答案的「開卷考」。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide12" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・應用情境</div><div class="sl-title">RAG 怎麼幫上忙？以篩檢諮詢為例</div><div class="sl-sub">民眾問：「我今年 55 歲，可以免費做大腸癌篩檢嗎？」— 看看兩種 AI 的差別</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-col" style="background:#fdecea;border-color:#f5c6c6"><div class="sl-col-title" style="color:var(--er)">✕ 沒有 RAG 的一般 AI</div><div class="sl-col-item">它可能撈到國外網站的舊資料，回答了錯誤的年齡限制。</div><div class="sl-col-item">後果：民眾被誤導，可能因此錯失及早發現的機會。</div></div><div class="sl-col" style="background:#eafaf1;border-color:#a3d9b1"><div class="sl-col-title" style="color:var(--ok)">✓ 導入 RAG 的 AI 客服</div><div class="sl-col-item">① 檢索　到最新的《癌症篩檢補助辦法》中搜尋，找到「45–74 歲民眾每 2 年可做 1 次免費糞便潛血檢查」。</div><div class="sl-col-item">② 增強　把這條最新規定，與民眾「55 歲」的條件結合起來。</div><div class="sl-col-item">③ 生成　回答：「您好！您今年 55 歲，完全符合資格！」</div><div class="sl-col-item">結果：提供 100% 正確的在地資訊，又帶著親切的服務溫度。</div></div></div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide13" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・動手實作</div><div class="sl-title">用 NotebookLM 打造專屬助理</div><div class="sl-sub">Google 推出的免費工具，免寫程式就能體驗 RAG。跟著四個步驟做做看</div>
+    <div class="slide-body"><div class="sl-steps"><div class="sl-step"><div class="sl-step-num">①</div><div><div class="sl-step-title">建立筆記本</div><div class="sl-step-text">用 Google 帳號登入 NotebookLM，點「新增筆記本」。它就像一個專屬資料夾。</div></div></div><div class="sl-step"><div class="sl-step-num">②</div><div><div class="sl-step-title">上傳資料來源</div><div class="sl-step-text">把 PDF、Google 文件、文字檔，甚至 YouTube 網址，拖進「來源」區塊。這是最關鍵的一步。</div></div></div><div class="sl-step"><div class="sl-step-num">③</div><div><div class="sl-step-title">開始對話</div><div class="sl-step-text">在下方對話框提問。你是在跟「剛讀完這些文件的 AI 專家」對話，不是漫無目的全網搜尋。</div></div></div><div class="sl-step"><div class="sl-step-num">④</div><div><div class="sl-step-title">查看引用來源</div><div class="sl-step-text">答案後面會有 [1] [2] 標號。點下去，會跳出原始 PDF 並用螢光筆標出參考的頁數段落。</div></div></div></div><div class="sl-note">💡 範例問法：「請依這份指引，整理糞便潛血陽性後的確診流程與建議追蹤時間，並列點說明。」</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide14" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">單元二・關鍵價值</div><div class="sl-title">最強價值：有一分證據，說一分話</div><div class="sl-sub">RAG 與 NotebookLM 之所以適合醫療領域，關鍵就在「可追溯」與「資料把關」</div>
+    <div class="slide-body"><div class="sl-two-col"><div class="sl-col" style="background:#eafaf1;border-color:#a3d9b1"><div class="sl-col-title" style="color:var(--ok)">引用來源（Citations）</div><div class="sl-col-item">答案的每一段後面都有 [1] [2] 標號</div><div class="sl-col-item">點下去就能看到原始文件、原始頁數與段落</div><div class="sl-col-item">可以直接對民眾出示官方文件，確保權威性</div><div class="sl-col-item">永遠能追溯源頭，徹底消除 AI 幻覺的風險</div></div><div class="sl-col" style="background:#fff8e1;border-color:#f5a623"><div class="sl-col-title" style="color:#e67e22">⚠ 資料品質的省思</div><div class="sl-col-item">開卷考的前提，是「課本本身要正確」</div><div class="sl-col-item">RAG 是依你上傳的資料來回答（開卷考）</div><div class="sl-col-item">若上傳的文件過時或錯誤，AI 也會跟著答錯</div><div class="sl-col-item">上傳前請確認是「最新版本」且內容正確</div><div class="sl-col-item">PDF 要是可選取文字的數位版，避免掃描影像檔</div></div></div><div class="sl-note">💡 貼心提醒：把爬梳長篇文件的苦差事交給 NotebookLM，您就能更省力地吸收新知。</div></div>
+    
+  </div>
+</div>
+<div class="slide" id="slide15" style="display:none">
+  <div class="slide-inner">
+    <div class="sl-unit">SUMMARY・課後行動</div><div class="sl-title">重點回顧 × 立即行動</div><div class="sl-sub">生成式 AI 讓你「快速產出」，RAG 讓你「產出得準」。兩者搭配，AI 才能成為你可信賴的專業助手。</div>
+    <div class="slide-body"><div class="sl-grid3"><div class="sl-sum-card"><div class="sl-sum-step">第一步・觀念</div><div class="sl-sum-title">用比喻說一次</div><div class="sl-sum-text">試著用「天才醫師與助理」的比喻，向不懂電腦的同事解釋什麼是 RAG。</div></div><div class="sl-sum-card"><div class="sl-sum-step">第二步・盤點</div><div class="sl-sum-title">找出適合的文件</div><div class="sl-sum-text">想想工作中有哪些常要翻找、核對的 SOP、法規或指引，很適合丟進 NotebookLM。</div></div><div class="sl-sum-card"><div class="sl-sum-step">第三步・實作</div><div class="sl-sum-title">親手試一次</div><div class="sl-sum-text">挑一份文件上傳 NotebookLM，用 CREATE 框架提問，並點開 [1] 引用查核來源。</div></div></div></div>
+    
+  </div>
+</div>
+      <!-- nav -->
+      <div class="sl-nav">
+        <button class="sl-btn sl-btn-prev" id="slPrev" onclick="goSlide(_curSlide-1)" disabled>← 上一頁</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div class="sl-dots"><div class="sl-dot on" onclick="goSlide(0)"></div><div class="sl-dot" onclick="goSlide(1)"></div><div class="sl-dot" onclick="goSlide(2)"></div><div class="sl-dot" onclick="goSlide(3)"></div><div class="sl-dot" onclick="goSlide(4)"></div><div class="sl-dot" onclick="goSlide(5)"></div><div class="sl-dot" onclick="goSlide(6)"></div><div class="sl-dot" onclick="goSlide(7)"></div><div class="sl-dot" onclick="goSlide(8)"></div><div class="sl-dot" onclick="goSlide(9)"></div><div class="sl-dot" onclick="goSlide(10)"></div><div class="sl-dot" onclick="goSlide(11)"></div><div class="sl-dot" onclick="goSlide(12)"></div><div class="sl-dot" onclick="goSlide(13)"></div><div class="sl-dot" onclick="goSlide(14)"></div></div>
+          <span class="sl-counter" id="slCounter">1 / 15</span>
+        </div>
+        <button class="sl-btn sl-btn-next" id="slNext" onclick="goSlide(_curSlide+1)">下一頁 →</button>
+      </div>
+    </div>
+<div class="sdm" id="dm1">✅ 必讀教材已完成！現在可以開始考試，或繼續閱讀延伸資料。</div>
+
+    <div style="margin-top:18px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="background:#6c757d;color:#fff;border-radius:20px;padding:3px 14px;font-size:calc(var(--fs) - 2px);font-weight:700">延伸閱讀</span>
+        <span style="font-size:calc(var(--fs) - 1px);color:#555">想了解更多？點擊展開閱讀，不影響考試資格。</span>
+      </div>
+      <div style="border:1px solid var(--br);border-radius:var(--rs);overflow:hidden;margin-bottom:10px">
+        <div onclick="toggleExt(1)" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);cursor:pointer;user-select:none">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">📘</span><div><div style="font-weight:700;color:var(--bd);font-size:var(--fs)">M3-1 生成式 AI 基礎概念全解析講義</div><div style="font-size:calc(var(--fs) - 2px);color:#88aacc">完整版文字講義，含更多範例與說明</div></div></div>
+          <span id="ext1icon" style="color:var(--bp);transition:transform .3s;font-size:16px">&#9660;</span>
+        </div>
+        <div id="ext1" style="display:none;padding:20px;border-top:1px solid var(--br)">
+  <div class="rc">
+<h2>進入 AI 新紀元 — 生成式 AI (Gen AI) 基礎概念全解析</h2>
+<h3>課前導讀與學習目標</h3>
+<p>在過去的幾年裡，您可能常在新聞上聽到「人工智慧」、「演算法」這些詞彙，但總覺得它們離我們的日常生活很遙遠。直到 ChatGPT、Gemini 等工具橫空出世，AI 突然變成了一個可以跟我們聊天、幫我們寫報告、甚至幫我們構思企劃案的「數位同事」。</p>
+<p>推動這場革命的核心技術，就叫做生成式人工智慧（Generative AI，簡稱 <span class="hl">Gen AI</span>）。</p>
+<p>本堂課程是通往現代 AI 應用的第一扇大門。我們將帶您揭開這群「超級天才」的神秘面紗，了解它們是如何運作的，並且學會如何正確地對它們下指令。更重要的是，這堂課將與我們下一堂的「<span class="hl">RAG</span>（檢索增強生成）」課程緊密相連，為您建構最完整的 AI 實戰知識庫。</p>
+<h3>閱讀完本講義，您將能夠：</h3>
+<ul>
+  <li>清楚分辨「傳統 AI」與「生成式 AI」的根本差異</li>
+  <li>理解大型語言模型（LLM）背後「文字接龍」的基本運作邏輯</li>
+  <li>掌握生成式 AI 在職場與生活中的四大核心能力（生成、摘要、轉換、發想）</li>
+  <li>學會「提示詞工程（Prompt Engineering）」的基礎框架，精準指揮 AI</li>
+  <li>了解純粹生成式 AI 的極限與盲區，為下一階段學習 RAG 技術打下基礎</li>
+</ul>
+<h2>從「判別」到「生成」 —  AI 發生了什麼革命？</h2>
+<p>要了解<span class="hl">生成式 AI</span> 的強大，我們首先要回顧一下過去的 AI 在做什麼。</p>
+<h3>過去的 AI：嚴格的「分類員」與「分析師」傳統的 AI（也就是判別式 AI）非常擅長「找規律」和「做分類」。</h3>
+<p>想像一位在醫院檢驗科工作的機器人分析師，你給它看十萬張肺部 X 光片，告訴它哪些是正常的，哪些有腫瘤。訓練完成後，你給它一張全新的 X 光片，它能精準地「判別」出這張片子是否有異常。傳統 AI 也能根據您過去的購物紀錄，預測您接下來可能會想買什麼品牌的保健食品。</p>
+<p>它們的工作核心是：從既有的選項中，找出正確的答案或機率。它們不會「創造」不存在的東西。</p>
+<h3>現在的 AI：充滿創意的「創作者」</h3>
+<p><span class="hl">生成式 AI</span> 則完全不同，它跨越了判別的界線，擁有了「創造」的能力。</p>
+<p>這就像是你給 AI 看過全世界千萬張不同風格的畫作，或者讀過圖書館裡所有的詩集和報告。當你對它說：「請幫我畫一顆長得像鳳梨的蘋果」，或是「請幫我寫一封委婉拒絕廠商報價的電子郵件」時，它不會去資料庫裡「搜尋」一封現成的信件複製貼上，而是根據它學習到的語言規則和邏輯，當下「生成（Generate）」出一個全世界獨一無二的全新內容。</p>
+<p>這就是 <span class="hl">Gen AI</span> 最迷人的地方：它把電腦從一個「超強的計算機」，變成了一個「可以溝通、可以共同創作的聰明大腦」。</p>
+<h2>超級大腦是怎麼煉成的？ — 大語言模型 (LLM) 的奧秘</h2>
+<p>目前我們最常接觸到的文字型<span class="hl">生成式 AI</span>，背後的核心技術叫做大型語言模型（Large Language Model，簡稱 <span class="hl">LLM</span>）。這個名詞聽起來很生硬，但它的運作原理，可以用一個大家小時候都玩過的遊戲來解釋：<span class="hl">文字接龍</span>。</p>
+<h3>讀萬卷書的極致填空遊戲</h3>
+<p>人類學習語言，是透過理解字詞背後的意義；但 AI 學習語言，是透過尋找「機率與規律」。</p>
+<h2>在 AI 出廠前，科學家會讓它閱讀海量的資料庫—包含維基百科、公開的新聞、科學期刊、甚至是各種論壇的對話。AI 會在這些資料中尋找每一個字詞接續出現的機率。</h2>
+<p>舉個簡單的例子：當我們看到「祝你生日」這四個字，我們的大腦會自動浮現「快樂」。</p>
+<p><span class="hl">生成式 AI</span> 也是一樣的，當它看到「祝你生日」時，它會計算出下一個字是「快」的機率高達 99%，是「蘋」的機率只有 0.001%。因此它輸出了「快」。接著它又根據「祝你生日快」，算出下一個字應該是「樂」。</p>
+<p>透過擁有千億個參數的超級神經網路，AI 能夠處理極度複雜的「長篇<span class="hl">文字接龍</span>」。當您問它：「為什麼運動有助於身體健康？」它其實並不是像人類一樣在腦海裡思考生物學的原理，而是透過它讀過的龐大醫學與健康文獻，計算出最合理、最流暢的字詞組合，一個字一個字地「接」出一篇完美的衛教文章。</p>
+<p style="background:#f0f4ff;border-left:3px solid var(--bm);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 1px);color:#333;font-style:italic">就像細胞內的 DNA 序列決定了蛋白質的生成，AI 模型內的機率演算法與參數，決定了文字生成的品質與邏輯。</p>
+<p><span class="hl">生成式 AI</span> 的四大核心「超能力」</p>
+<p>了解了 AI 的運作原理後，我們來看看這位擁有一顆「超級大腦」的虛擬同事，能在我們日常的工作與專案執行中，展現哪些具體的超能力。</p>
+<h3>內容生成 (Generation)：從0到1的創造</h3>
+<p>這是 AI 最廣為人知的能力。當您面對空白的 Word 文件發呆時，AI 可以為您打破僵局。</p>
+<div class="box"><div class="bt">📌 應用情境</div>您是醫院的專案導入助理，需要撰寫一份「新一代資訊系統導入計畫書」的初稿。您只需給 AI 幾個關鍵字（時間、預算、目標部門），它能在幾秒鐘內為您生成一份結構完整的企劃書草案，為您省下數小時的打字時間。</div>
+<h3>資訊摘要 (Summarization)：一秒讀完長篇大論</h3>
+<p>我們每天都要面對資訊轟炸，AI 是您最好的知識濃縮機。</p>
+<div class="box"><div class="bt">📌 應用情境</div>您手邊有一份長達 30 頁的全英文「國際肌少症營養介入指引」。您可以把文章貼給 AI，請它：「幫我把這份指引濃縮成 500 字的中文摘要，並列出針對 65 歲以上長者的三大蛋白質補充重點。」</div>
+<h3>角色與語氣轉換 (Transformation)：完美的翻譯官</h3>
+<p>這裡的翻譯不只是語言的翻譯（英翻中），還包括「語氣」和「受眾」的翻譯。</p>
+<div class="box"><div class="bt">📌 應用情境</div>醫師寫了一段充滿艱澀專業術語的病歷摘要或檢驗報告。您可以請 AI：「你現在是一位親切的公共衛生護理師，請把這段醫學文字，改寫成國中生也能看懂的衛教宣傳單語氣，並且多用鼓勵性的詞彙。」</div>
+<h3>創意發想 (Brainstorming)：不知疲倦的點子王</h3>
+<p>當您需要策劃活動卻毫無靈感時，AI 是最好的腦力激盪夥伴。</p>
+<div class="box"><div class="bt">📌 應用情境</div>您要為社區規劃一場「大腸癌免費篩檢推廣活動」，但不想再用傳統的發傳單方式。您可以問 AI：「請給我 10 個具備創意、且能在預算一萬元以內執行的社區長者大腸癌篩檢推廣點子，越有互動性越好。」</div>
+<h2>正確與 AI 溝通的藝術 — 提示詞工程 (Prompt Engineering)</h2>
+<p><span class="hl">生成式 AI</span> 就像是一個擁有過目不忘能力，且閱讀過全世界圖書館裡所有公開書籍的「超級天才」。但是，如果您給天才的指令不清楚，他給您的答案也會不知所云。在 AI 時代，「你怎麼問，決定了你得到什麼」。這種與 AI 溝通的技巧，我們稱為提示詞工程（Prompt Engineering）。</p>
+<p>要寫出能讓 AI 瞬間給出完美答案的指令，業界發展出了許多「填空題公式」來幫助大家記憶與建立邏輯。請記住，提示詞的框架並非僅有這兩種，它們不是死板的規定，而是提供思考引導的參考工具。只要掌握核心元素，您就能自由發揮。</p>
+<p>這裡為大家介紹兩種最常見、最實用的結構化模板：</p>
+<h3>方法一：CLEAR Prompt (清晰提示法)</h3>
+<ul>
+  <li><strong>C – Context（背景）：交代前因後果與現況。</strong></li>
+  <li><strong>L – Lead role（角色）：賦予 AI 一個專家的身分。</strong></li>
+  <li><strong>E – Exact task（任務）：明確下達具體要完成的工作。</strong></li>
+  <li><strong>A – Answer format（格式）：要求以表格、列點或段落呈現。</strong></li>
+  <li><strong>R – Requirements（限制＋成功標準）：給予參考句型，或要求避開某些字眼。</strong></li>
+</ul>
+<h3>方法二：CREATE 框架 (6字母口訣)</h3>
+<ul>
+  <li><strong>C - Context (背景脈絡)：告訴 AI 現在的狀況是什麼。</strong></li>
+  <li><strong>R - Role (扮演角色)：賦予 AI 一個專家的身分。</strong></li>
+  <li><strong>E - Exact Task (具體任務)：明確說明你要它做什麼。</strong></li>
+  <li><strong>A - Action/Format (輸出格式)：指定答案呈現的樣子。</strong></li>
+  <li><strong>T - Tone (語氣)：希望它用什麼態度說話（如親切、專業）。</strong></li>
+  <li><strong>E - Examples / Extras (範例與補充限制)：給予參考句型，或指定避開的字眼。</strong></li>
+</ul>
+<p style="color:#88aacc;font-size:calc(var(--fs) - 2px);font-style:italic">(實務小提示：您會發現，這兩種框架雖然字母縮寫不同，但核心都在強調「背景、角色、任務、格式、限制」)</p>
+<h3 style="color:var(--bp);margin-top:18px">【實戰對比】</h3>
+<p>糟糕的提示詞： 「幫我寫一篇推廣大腸癌篩檢的文章。」</p>
+<p style="color:#88aacc;font-size:calc(var(--fs) - 2px);font-style:italic">(結果：AI 可能會寫出一篇極度官腔、無聊，甚至像外國人寫的翻譯文章，對您的工作毫無幫助。)</p>
+<p>優質的提示詞（以套用完整 CREATE 框架為例）：：</p>
+<p>「我目前在地方衛生局擔任專案助理，我們這個月的目標是要提升轄區內 45-74 歲民眾的大腸癌篩檢率 (C)。請你扮演一位擁有 10 年經驗、非常了解長輩心理的社區公衛推廣專家 (R)。</p>
+<p>請幫我撰寫一篇要在 Facebook或Instagram發布的宣傳貼文 (第一個 E: 具體任務)。這篇貼文請控制在 300 字以內，並在結尾條列出 3 個民眾最常問的 Q&A (A)。語氣要親切、幽默，像是在跟鄰居長輩聊天一樣 (T)。你可以參考這個句型作為開場範例：『各位阿公阿嬤呷飽未？』，並且請避開提到『開刀』、『癌症末期』等會引發恐慌的字眼 (第二個 E: 範例與補充限制)。」</p>
+<p>當您學會了這樣下指令，您會發現 AI 給出的結果，幾乎可以直接複製貼上使用，工作效率將呈現指數型的飆升。</p>
+<h2>天才的阿基里斯腱 — 為什麼我們需要下一堂課？</h2>
+<p><span class="hl">生成式 AI</span> 雖然強大，但隨著您越頻繁地使用，您一定會遇到一些令人頭痛的瓶頸。這就帶出了我們在下一堂課必須解決的核心問題。</p>
+<p>這群超級天才雖然閱讀了無數的公開資料，但它們有三個致命的弱點 ：</p>
+<p>資訊更新的「時間差」 ：AI 的知識來自於它被送進工廠「訓練」的那段時間。如果它的記憶停留在 2023 年，當您詢問它 2026 年最新發布的醫療法規或最新的公衛補助方案時，它會一無所知，或者給出過時的答案。</p>
+<p>缺乏「專屬與私密」領域的知識 ：AI 閱讀的是網際網路上的「公開」資料。然而，在真實世界中，最有價值的資訊往往是不公開的。例如：您正在參與的醫院專案導入計畫、最新的內部排班規範、或是某項健康科技產品的內部推廣手冊。這些資料 AI 從未看過，自然無法回答相關問題。</p>
+<p>令人困擾的「<span class="hl">AI 幻覺</span>（Hallucination）」：當這位超級天才被問到一個它不懂、或是缺乏相關資料的問題時，它有時候不會坦白承認「我不知道」。因為它的本能是「生成流暢的文字」，它會利用機率與<span class="hl">文字接龍</span>的技巧，一本正經地編造出一個聽起來極具說服力，但實際上完全錯誤的答案。在醫療保健或公共衛生等容錯率極低的領域，這種「幻覺」會帶來嚴重的誤導與風險。</p>
+<p>如果您希望 AI 不只是幫您潤飾文章，而是能精準回答您院內的最新 SOP、能幫您整理充滿數據的機密企劃案，又保證絕對不胡說八道，該怎麼辦？</p>
+<h2>為了解決這些痛點，科學家們並不是把 AI 打掉重練，而是開發出了一套全新的協作機制 — RAG（檢索增強生成）。</h2>
+<p>如果說<span class="hl">生成式 AI</span> 是一位「天才醫師」，那麼 <span class="hl">RAG</span> 就像是給這位醫師配備了一位「擁有專屬檔案室鑰匙的超強助理」。關於如何為您的 AI 聘請這位助理，並利用 Google <span class="hl">NotebookLM</span> 這樣的工具來徹底消除 <span class="hl">AI 幻覺</span>，我們將在下一堂課《讓 AI 成為精準的專業助手—RAG 與 NotebookLM 實戰全解析》中，為您揭曉這個改變工作型態的終極秘密。</p>
+<h2>第六章：總結與課後思考</h2>
+<p><span class="hl">生成式 AI</span> 代表了人類工具史上的一次巨大飛躍。我們不再需要像過去一樣，背誦複雜的程式碼來操控電腦；現在，我們只需要用最自然的「人類語言」，就能喚醒電腦裡的超級大腦為我們服務。掌握 <span class="hl">Gen AI</span>，不是要讓 AI 取代我們，而是要讓自己成為那個「懂得指揮 AI 的總管」。</p>
+<h3 style="color:var(--bp);margin-top:18px">【課後自我檢測與思考】</h3>
+<ul>
+  <li><strong>觀念重塑：</strong>試著用您自己的話，向身邊的同事解釋「傳統分析分類的 AI」與「生成式 AI」最大的差別是什麼？</li>
+  <li><strong>日常應用盤點：</strong>回顧您過去一週的工作（例如：會議紀錄整理、專案信件回覆、發想推廣文案），有哪些環節是您可以立刻放手讓 Gen AI 來幫忙起草的？</li>
+  <li><strong>提示詞演練：</strong>試著用講義中提到的「CREATE 框架」，寫下一段您明天就能對 AI 測試的提示詞指令。</li>
+</ul>
+  </div>
+</div>
+<div id="ext2" style="display:none;padding:20px;border-top:1px solid var(--br)">
+  <div class="rc">
+<h2>讓 AI 成為精準的專業助手 — RAG (檢索增強生成) 與 NotebookLM 實戰全解析</h2>
+<h3>課前導讀與學習目標</h3>
+<p>在當今的數位時代，<span class="hl">生成式 AI</span>（Generative AI）如 ChatGPT、Gemini 等工具已經深刻地改變了我們的工作與生活方式。然而，當我們需要 AI 處理高度專業、具備時效性或屬於機構內部機密的資訊時，傳統的生成式 AI 往往會顯得力不從心，甚至給出錯誤資訊。</p>
+<p>本堂課程旨在為您建立關於 <span class="hl">RAG</span>（Retrieval-Augmented Generation，檢索增強生成） 的完整基礎概念，並帶領您實際操作目前市面上最強大、且完全免寫程式的 RAG 應用工具 — Google <span class="hl">NotebookLM</span>。</p>
+<h3>閱讀完本講義，您將能夠：</h3>
+<ul>
+  <li>理解傳統生成式 AI 常見的「幻覺」問題及其產生原因</li>
+  <li>以生活化的概念（如醫師與助理的合作模式）解釋 RAG 的核心運作邏輯</li>
+  <li>清楚拆解 RAG 的三個關鍵步驟：檢索（R）、增強（A）、生成（G）</li>
+  <li>明白 RAG 在實際生活與專案管理中的應用價值</li>
+  <li>能夠親自動手使用 NotebookLM，將繁雜的文件轉化為您專屬的 AI 智慧助理</li>
+</ul>
+<h2>痛點分析 — 為什麼AI 會「胡說八道」？</h2>
+<p>在認識 <span class="hl">RAG</span> 之前，我們必須先了解<span class="hl">生成式 AI</span> 的運作限制。目前的生成式 AI 就像是一位擁有過目不忘能力，且閱讀過全世界圖書館裡所有公開書籍的「超級天才」。它可以幫我們寫文章、翻譯外文，甚至進行複雜的邏輯推理。</p>
+<p>但是，這位天才有三個致命的弱點：</p>
+<p>資訊更新的「時間差」</p>
+<p>AI 的知識來自於它被送進工廠「訓練」的那段時間。如果一個 AI 模型的訓練資料截止於 2023 年，那麼對於它來說，世界的時間就停留在 2023 年。當您詢問它最新發布的醫學研究、最新的營養學指引或是當年度的法規時，它會一無所知，或者給出過時的答案。</p>
+<p>缺乏「專屬與私密」領域的知識</p>
+<p>AI 閱讀的是網際網路上的「公開」資料。然而，在真實世界中，最有價值的資訊往往是不公開的。例如：您正在參與的醫院專案導入計畫、最新的內部排班規範、或是某項健康科技產品的內部經銷與推廣手冊。這些資料 AI 從未看過，自然無法回答相關問題。</p>
+<p>令人困擾的「<span class="hl">AI 幻覺</span>（Hallucination）」</p>
+<p>當這位超級天才被問到一個它不懂、或是缺乏相關資料的問題時，它有時候不會坦白承認「我不知道」。相反地，因為它的本能是「生成流暢的文字」，它會利用機率與<span class="hl">文字接龍</span>的技巧，一本正經地編造出一個聽起來極具說服力，但實際上完全錯誤的答案。在生物學、醫療保健或公共衛生等容錯率極低的領域，這種「幻覺」會帶來嚴重的誤導與風險。</p>
+<h2>為了解決這些痛點，科學家們並不是把 AI 打掉重練，而是開發出了一套全新的協作機制 — RAG。</h2>
+<h2>RAG 核心概念 — 「天才醫師與他的超強助理」</h2>
+<p><span class="hl">RAG</span> 全名為 Retrieval-Augmented Generation（檢索增強生成）。這三個英文字母看起來非常技術性，但我們可以用一個非常貼切的生活情境來理解它。</p>
+<p>請想像一下，純粹的<span class="hl">生成式 AI</span>，就像是一位剛從全球頂尖醫學院以第一名畢業的「天才醫師」。這位醫師的大腦裡裝滿了基礎生物學、人體解剖學和所有公開的醫學期刊。您問他任何廣泛的健康常識，他都能對答如流。</p>
+<p>但是，今天如果專案導入助理走到這位醫師面前問：「醫師，請問我們院內昨天下午剛發布的『新世代醫療資訊系統專案導入規範』中，關於跨部門系統測試的標準流程是什麼？」</p>
+<p>這位天才醫師絕對答不出來，因為他的大腦裡根本沒有這份剛出爐的內部規章。如果他硬要回答，可能就會產生「幻覺」，隨便拿別家醫院的規定來敷衍您。</p>
+<p>這時候，<span class="hl">RAG</span> 的機制就登場了。</p>
+<p><span class="hl">RAG</span> 就像是給這位天才醫師配備了一位「擁有專屬檔案室鑰匙的超強助理」。</p>
+<p>當您提出關於內部規章的問題時：</p>
+<p>助理（檢索系統） 會立刻轉身，打開專屬檔案櫃，精準地翻找到那份昨天才發布的「專案導入規範」。</p>
+<p>助理將這份文件的相關段落標記出來，連同您的問題，一起遞交給天才醫師。</p>
+<p>醫師（<span class="hl">生成式 AI</span>） 快速閱讀了助理提供的最新、最正確的內部文件，接著發揮他卓越的邏輯與語言能力，轉過頭來對您說：「您好，根據本院最新規定，跨部門系統測試必須符合以下三個標準流程……」</p>
+<p>透過這位助理的幫忙，醫師不需要重新去讀書，就能完美、精準地回答各種最新或是最機密的問題。這就是 <span class="hl">RAG</span> 的核心精神：不改變 AI 的大腦，而是給它一本隨時更新的參考書。</p>
+<h3>深入拆解 RAG 的三個運作步驟</h3>
+<p>有了上述的概念後，我們再來拆解 <span class="hl">RAG</span> 的三個字母，您會發現一切都變得非常直觀：</p>
+<p>步驟一：R - Retrieval（檢索）</p>
+<p>這是整個機制的第一道關卡，也就是「助理去檔案室找資料」的過程。 我們需要先建立一個專屬的「知識庫」（例如：政府最新的公衛公告、專案企劃書、健康產品說明書）。當使用者對 AI 提出問題時，系統並不是立刻讓 AI 自由發揮，而是先啟動一個類似 Google 搜尋的引擎。這個搜尋引擎會在專屬知識庫中，撈取出與使用者問題「最相關」的文件段落。</p>
+<p>步驟二：A - Augmented（增強 / 擴充）</p>
+<p>「增強」這個詞聽起來很抽象，但它的實際動作就是「提供補充教材」。 系統會將使用者原本的「問題」，以及剛剛檢索系統找出來的「參考資料」，兩者打包在一起。就像是助理在找出的文件上貼了一張寫著問題的便利貼，一併交給 AI 模型。在這個階段，AI 的背景知識被這些精準的參考資料給「增強」了。</p>
+<p>步驟三：G - Generation（生成）</p>
+<p>最後一步，才輪到<span class="hl">生成式 AI</span> 登場。 AI 接收到了「問題」加上「正確的參考資料」後，它開始扮演一個「整理者」的角色。它會根據參考資料的內容，用人類聽得懂、自然流暢且有禮貌的語言，把最終的答案「生成」出來。因為所有的回答都是基於剛才找出來的證據，AI 就不會憑空捏造事實了。</p>
+<p>簡單來說，一般 AI 像是參加「閉卷考試」，全憑記憶作答；而 <span class="hl">RAG</span> 則是讓 AI 參加一場擁有標準答案的「開卷考試（Open-book exam）」。</p>
+<h3>實戰應用情境解析</h3>
+<p>為了讓大家更有感，我們來看看 <span class="hl">RAG</span> 在實際領域中如何發揮巨大作用：</p>
+<h3>情境一：公共衛生推廣與諮詢</h3>
+<p>在推廣公共衛生政策時，資訊的正確性攸關民眾的健康權益。假設我們要設計一個回答民眾大腸癌篩檢資格的 AI 客服：</p>
+<p>沒有 <span class="hl">RAG</span> 的一般 AI：</p>
+<p>民眾詢問：「我今年 55 歲，可以免費做大腸癌篩檢嗎？」AI 可能會撈到國外網站的舊資料，回答錯誤的年齡限制，導致民眾錯失及早發現的機會。</p>
+<p>導入 <span class="hl">RAG</span> 的 AI 客服：</p>
+<p>檢索： 系統立刻在最新的「癌症篩檢補助辦法」中搜尋，找到「45 歲至 74 歲民眾，每兩年可做一次免費定量免疫法糞便潛血檢查」。</p>
+<p>增強： 將最新條文與民眾的 55 歲條件結合。</p>
+<p>生成： AI 回答：「您好！根據最新規定，40 到 74 歲的民眾每兩年可進行一次免費篩檢。您今年 55 歲，完全符合資格喔！」 結果：提供 100% 正確的在地資訊，並帶有親切的服務溫度。</p>
+<h3>情境二：醫院內部專案或業務管理</h3>
+<p>在大型機構中，行政與專案執行的流程繁瑣且經常更新。一名專案導入助理詢問系統：「今年度引進新型健康照護設備，需要檢附哪些環境評估文件？」透過 <span class="hl">RAG</span> 技術，系統會直接進入內部的「2026 年度專案 SOP 資料夾」進行檢索，並將最新的表單名稱與流程，整理成列點式的清晰步驟回覆給人員。這不僅節省了翻找厚重檔案的時間，也避免了因為看錯舊版法規而導致專案退件的風險。</p>
+<h2>動手打造您的專屬 AI 助理 —— NotebookLM 實戰教學</h2>
+<p>理論聽起來很棒，但我們一般人不會寫程式，該怎麼體驗 <span class="hl">RAG</span> 的威力呢？Google 推出的 <span class="hl">NotebookLM</span> 就是為此而生的免費工具。它完美體現了 RAG 的概念，讓您無需任何程式背景，就能建立專屬的知識庫。</p>
+<p>您可以把 <span class="hl">NotebookLM</span> 想像成一個極度聰明且不知疲倦的超級助理。您可以將厚重的專案文件、營養學期刊或產品手冊丟給它，然後直接對它提問。</p>
+<h3>實作步驟拆解：</h3>
+<p>步驟一：建立您的專屬筆記本 (建立檔案室)</p>
+<p>使用 Google 帳號登入 <span class="hl">NotebookLM</span> 網站。</p>
+<p>點擊「新增筆記本 (New Notebook)」。這個筆記本就像是一個專屬的專案資料夾。</p>
+<p>步驟二：上傳資料來源 (把資料放進檔案櫃) 這是最關鍵的一步。您可以上傳多種格式的文件（如 PDF、Google 文件、文字檔、甚至 YouTube 網址）。</p>
+<div class="box"><div class="bt">📌 應用情境</div>假設您手邊有一份數十頁的「大腸直腸癌篩檢與防治實務指引」PDF 檔，或是您自己整理的「健康產品成分與功能分析」文件。請直接將這些文件拖曳上傳至 NotebookLM 的「來源 (Sources)」區塊。</div>
+<p>步驟三：開始與您的資料對話 (啟動檢索與生成) 文件上傳完成後，您會看到下方有一個對話框。這時，您不再是向全網搜尋，而是在跟「剛剛讀完這些文件的 AI 專家」對話。</p>
+<div class="box"><div class="bt">範例提問方式</div>「請根據這份指引，幫我整理出糞便潛血檢查呈現陽性時，後續的確診流程與建議的追蹤時間，並列點說明。」或「這項健康產品的主要專利成分是什麼？對應的適用族群有哪些？」</div>
+<p>步驟四：見證 <span class="hl">RAG</span> 的魔法 —— 查看「引用來源 (Citations)」 當 <span class="hl">NotebookLM</span> 給出流暢、有條理的回答時，您會發現答案的每一段後面都有小小的數字標號（例如 [1], [2]）。</p>
+<p>點擊這些數字： 系統會立刻在畫面上方跳出您上傳的原始 PDF 文件，並且用螢光筆標示出 AI 是參考了第幾頁、第幾段的內容來回答您的。</p>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 1px);color:#1a6644"><strong>這就是 RAG 的最強價值： 「有一分證據，說一分話。」您永遠可以追溯資料的源頭，徹底消除了 AI 幻覺的風險。</strong></p>
+<p>有了 <span class="hl">NotebookLM</span>，您在閒暇時不用再對著雜亂無章的資料發愁。您可以放點輕鬆的音樂，喝杯茶，把整理思緒、爬梳長篇大論的苦差事交給這個專屬助理，大幅提升吸收新知的效率。</p>
+<h3>總結與課後思考</h3>
+<p>總結來說，<span class="hl">RAG</span> 技術的出現，完美填補了<span class="hl">生成式 AI</span> 走向實用化與專業化的最後一哩路。它解決了幻覺問題、確保資訊即時更新，並完美保護了內部機密。</p>
+<p>未來，AI 不再只是陪我們聊天的工具，而是透過 <span class="hl">RAG</span> 技術（以及像 <span class="hl">NotebookLM</span> 這樣的優秀產品），成為真正懂您企業規則、熟悉您專案流程、並且永遠提供精確資訊的「最強專業助手」。</p>
+<h3 style="color:var(--bp);margin-top:18px">【課後自我檢測與思考】</h3>
+<ul>
+  <li><strong>觀念重塑：</strong>試著用「醫師與助理」的比喻，向身邊不懂電腦的朋友解釋什麼是 RAG。</li>
+  <li><strong>尋找應用場景：</strong>檢視您目前的工作或副業。有哪些經常需要翻找、核對的SOP、產品型錄或法規文件，是非常適合丟進 NotebookLM 讓它幫您整理的？</li>
+  <li><strong>資料品質的省思：</strong>既然 RAG 是基於我們提供的資料來回答（開卷考），如果我們上傳到 NotebookLM 的文件本身就是過時或錯誤的，AI 會給出正確答案嗎？這提醒了我們在日常的文件管理上，應該注意什麼？</li>
+</ul>
+<h2>附件一、 實戰案例教學指引</h2>
+<h3>【實戰案例一】：大腸癌篩檢公衛指引諮詢</h3>
+<p><strong>場景目標：</strong>確保一線工作人員能精準回覆民眾關於篩檢資格與後續追蹤的疑問，避免因資訊過時導致誤判。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>衛福部最新版《大腸癌篩檢與追蹤實務手冊》。</li>
+  <li>院內針對「糞便潛血反應陽性者」的轉介流程 SOP。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「請根據上傳資料，整理出 2026 年最新補助的篩檢對象資格（年齡、頻率），並以表格呈現。」</li>
+  <li>指令 B： 「若民眾反映糞便潛血檢查為陽性，請列出後續確診建議的黃金時間，以及應安排的檢查項目。」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 1px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>透過「引用來源」功能，工作人員可直接對民眾出示官方文件段落，確保衛教資訊的權威性。</p>
+<h3>【實戰案例二】：醫療設備導入與環境評估管理</h3>
+<p><strong>場景目標：</strong>協助專案管理人員在龐雜的行政法規中，快速定位特定設備導入所需的證明文件。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>環境保護署關於「醫療放射性廢棄物管理」的法規文件。</li>
+</ul>
+<p>醫院內部「2026 年度醫療儀器採購與安裝環境評估表」。</p>
+<ul>
+  <li>廠商提供的設備規格說明書（技術文件）。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「針對本次引進的 XX 型號放射性檢查設備，在安裝環境上需符合哪些法規規定的遮蔽標準？」</li>
+  <li>指令 B： 「請根據內部 SOP，列出申請安裝此設備時，行政流程中必須檢附的五項關鍵文件清單。」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 1px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>減少人工翻閱厚重法規的時間，並能自動對比「法規要求」與「設備規格」是否匹配。</p>
+<h3>【實戰案例三】：臨床營養指引與個案飲食建議</h3>
+<p><strong>場景目標：</strong>協助醫事人員或營養師，根據最新醫學共識為特定族群（如肌少症高齡者）提供具備實證基礎的營養介入方案。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>國際肌少症學會（EWGSOP2）最新共識報告。</li>
+  <li>高齡者膳食營養素參考攝取量（DRIs）最新修訂本。</li>
+  <li>院內常用營養品成分分析表。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「針對一位 75 歲、診斷為肌少症的男性，請根據指引計算其每日建議的蛋白質攝取總量（每公斤體重數值）。」</li>
+  <li>指令 B： 「比較現有上傳的三款營養補給品，哪一款最符合該個案在高量蛋白質且低含鈉量的營養需求？」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 1px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>解決生成式 AI 容易混淆各國營養指標的問題，強制 AI 僅能依據指定的「最新醫學指引」進行運算與比較。</p>
+<p>實作練習建議步驟</p>
+<p>為了達到最佳學習效果，建議在操作 <span class="hl">NotebookLM</span> 時遵循以下流程：</p>
+<ul>
+  <li><strong>資料預處理：</strong>確保上傳的 PDF 或文件非掃描影像檔（應為可選取文字的數位版），以利系統辨識。</li>
+  <li><strong>多來源詢問：</strong>同時上傳「法規」與「內部 SOP」，詢問兩者是否有衝突或需補強之處。</li>
+  <li><strong>引用查核：</strong>每當 AI 給出建議，請務必點擊後方的引文標記 [1]，確認 AI 擷取的段落是否完整，有無斷章取義。</li>
+</ul>
+  </div>
+</div>
+      <div style="border:1px solid var(--br);border-radius:var(--rs);overflow:hidden;margin-bottom:10px">
+        <div onclick="toggleExt(2)" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--gl);cursor:pointer;user-select:none">
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">📗</span><div><div style="font-weight:700;color:var(--bd);font-size:var(--fs)">M3-2 RAG 與 NotebookLM 實戰全解析講義</div><div style="font-size:calc(var(--fs) - 2px);color:#88aacc">完整版文字講義，含深入技術說明與實作步驟</div></div></div>
+          <span id="ext2icon" style="color:var(--bp);transition:transform .3s;font-size:16px">&#9660;</span>
+        </div>
+        <div id="ext2" style="display:none;padding:20px;border-top:1px solid var(--br)">
+  <div class="rc">
+<h2>讓 AI 成為精準的專業助手 — RAG (檢索增強生成) 與 NotebookLM 實戰全解析</h2>
+<h3>課前導讀與學習目標</h3>
+<p>在當今的數位時代，<span class="hl">生成式 AI</span>（Generative AI）如 ChatGPT、Gemini 等工具已經深刻地改變了我們的工作與生活方式。然而，當我們需要 AI 處理高度專業、具備時效性或屬於機構內部機密的資訊時，傳統的生成式 AI 往往會顯得力不從心，甚至給出錯誤資訊。</p>
+<p>本堂課程旨在為您建立關於 <span class="hl">RAG</span>（Retrieval-Augmented Generation，檢索增強生成） 的完整基礎概念，並帶領您實際操作目前市面上最強大、且完全免寫程式的 RAG 應用工具 — Google <span class="hl">NotebookLM</span>。</p>
+<h3>閱讀完本講義，您將能夠：</h3>
+<ul>
+  <li>理解傳統生成式 AI 常見的「幻覺」問題及其產生原因</li>
+  <li>以生活化的概念（如醫師與助理的合作模式）解釋 RAG 的核心運作邏輯</li>
+  <li>清楚拆解 RAG 的三個關鍵步驟：檢索（R）、增強（A）、生成（G）</li>
+  <li>明白 RAG 在實際生活與專案管理中的應用價值</li>
+  <li>能夠親自動手使用 NotebookLM，將繁雜的文件轉化為您專屬的 AI 智慧助理</li>
+</ul>
+<h2>痛點分析 — 為什麼AI 會「胡說八道」？</h2>
+<p>在認識 <span class="hl">RAG</span> 之前，我們必須先了解<span class="hl">生成式 AI</span> 的運作限制。目前的生成式 AI 就像是一位擁有過目不忘能力，且閱讀過全世界圖書館裡所有公開書籍的「超級天才」。它可以幫我們寫文章、翻譯外文，甚至進行複雜的邏輯推理。</p>
+<p>但是，這位天才有三個致命的弱點：</p>
+<p>資訊更新的「時間差」</p>
+<p>AI 的知識來自於它被送進工廠「訓練」的那段時間。如果一個 AI 模型的訓練資料截止於 2023 年，那麼對於它來說，世界的時間就停留在 2023 年。當您詢問它最新發布的醫學研究、最新的營養學指引或是當年度的法規時，它會一無所知，或者給出過時的答案。</p>
+<p>缺乏「專屬與私密」領域的知識</p>
+<p>AI 閱讀的是網際網路上的「公開」資料。然而，在真實世界中，最有價值的資訊往往是不公開的。例如：您正在參與的醫院專案導入計畫、最新的內部排班規範、或是某項健康科技產品的內部經銷與推廣手冊。這些資料 AI 從未看過，自然無法回答相關問題。</p>
+<p>令人困擾的「<span class="hl">AI 幻覺</span>（Hallucination）」</p>
+<p>當這位超級天才被問到一個它不懂、或是缺乏相關資料的問題時，它有時候不會坦白承認「我不知道」。相反地，因為它的本能是「生成流暢的文字」，它會利用機率與<span class="hl">文字接龍</span>的技巧，一本正經地編造出一個聽起來極具說服力，但實際上完全錯誤的答案。在生物學、醫療保健或公共衛生等容錯率極低的領域，這種「幻覺」會帶來嚴重的誤導與風險。</p>
+<h2>為了解決這些痛點，科學家們並不是把 AI 打掉重練，而是開發出了一套全新的協作機制 — RAG。</h2>
+<h2>RAG 核心概念 — 「天才醫師與他的超強助理」</h2>
+<p><span class="hl">RAG</span> 全名為 Retrieval-Augmented Generation（檢索增強生成）。這三個英文字母看起來非常技術性，但我們可以用一個非常貼切的生活情境來理解它。</p>
+<p>請想像一下，純粹的<span class="hl">生成式 AI</span>，就像是一位剛從全球頂尖醫學院以第一名畢業的「天才醫師」。這位醫師的大腦裡裝滿了基礎生物學、人體解剖學和所有公開的醫學期刊。您問他任何廣泛的健康常識，他都能對答如流。</p>
+<p>但是，今天如果專案導入助理走到這位醫師面前問：「醫師，請問我們院內昨天下午剛發布的『新世代醫療資訊系統專案導入規範』中，關於跨部門系統測試的標準流程是什麼？」</p>
+<p>這位天才醫師絕對答不出來，因為他的大腦裡根本沒有這份剛出爐的內部規章。如果他硬要回答，可能就會產生「幻覺」，隨便拿別家醫院的規定來敷衍您。</p>
+<p>這時候，<span class="hl">RAG</span> 的機制就登場了。</p>
+<p><span class="hl">RAG</span> 就像是給這位天才醫師配備了一位「擁有專屬檔案室鑰匙的超強助理」。</p>
+<p>當您提出關於內部規章的問題時：</p>
+<p>助理（檢索系統） 會立刻轉身，打開專屬檔案櫃，精準地翻找到那份昨天才發布的「專案導入規範」。</p>
+<p>助理將這份文件的相關段落標記出來，連同您的問題，一起遞交給天才醫師。</p>
+<p>醫師（<span class="hl">生成式 AI</span>） 快速閱讀了助理提供的最新、最正確的內部文件，接著發揮他卓越的邏輯與語言能力，轉過頭來對您說：「您好，根據本院最新規定，跨部門系統測試必須符合以下三個標準流程……」</p>
+<p>透過這位助理的幫忙，醫師不需要重新去讀書，就能完美、精準地回答各種最新或是最機密的問題。這就是 <span class="hl">RAG</span> 的核心精神：不改變 AI 的大腦，而是給它一本隨時更新的參考書。</p>
+<h3>深入拆解 RAG 的三個運作步驟</h3>
+<p>有了上述的概念後，我們再來拆解 <span class="hl">RAG</span> 的三個字母，您會發現一切都變得非常直觀：</p>
+<p>步驟一：R - Retrieval（檢索）</p>
+<p>這是整個機制的第一道關卡，也就是「助理去檔案室找資料」的過程。 我們需要先建立一個專屬的「知識庫」（例如：政府最新的公衛公告、專案企劃書、健康產品說明書）。當使用者對 AI 提出問題時，系統並不是立刻讓 AI 自由發揮，而是先啟動一個類似 Google 搜尋的引擎。這個搜尋引擎會在專屬知識庫中，撈取出與使用者問題「最相關」的文件段落。</p>
+<p>步驟二：A - Augmented（增強 / 擴充）</p>
+<p>「增強」這個詞聽起來很抽象，但它的實際動作就是「提供補充教材」。 系統會將使用者原本的「問題」，以及剛剛檢索系統找出來的「參考資料」，兩者打包在一起。就像是助理在找出的文件上貼了一張寫著問題的便利貼，一併交給 AI 模型。在這個階段，AI 的背景知識被這些精準的參考資料給「增強」了。</p>
+<p>步驟三：G - Generation（生成）</p>
+<p>最後一步，才輪到<span class="hl">生成式 AI</span> 登場。 AI 接收到了「問題」加上「正確的參考資料」後，它開始扮演一個「整理者」的角色。它會根據參考資料的內容，用人類聽得懂、自然流暢且有禮貌的語言，把最終的答案「生成」出來。因為所有的回答都是基於剛才找出來的證據，AI 就不會憑空捏造事實了。</p>
+<p>簡單來說，一般 AI 像是參加「閉卷考試」，全憑記憶作答；而 <span class="hl">RAG</span> 則是讓 AI 參加一場擁有標準答案的「開卷考試（Open-book exam）」。</p>
+<h3>實戰應用情境解析</h3>
+<p>為了讓大家更有感，我們來看看 <span class="hl">RAG</span> 在實際領域中如何發揮巨大作用：</p>
+<p>情境一：公共衛生推廣與諮詢</p>
+<p>在推廣公共衛生政策時，資訊的正確性攸關民眾的健康權益。假設我們要設計一個回答民眾大腸癌篩檢資格的 AI 客服：</p>
+<p>沒有 <span class="hl">RAG</span> 的一般 AI：</p>
+<p>民眾詢問：「我今年 55 歲，可以免費做大腸癌篩檢嗎？」AI 可能會撈到國外網站的舊資料，回答錯誤的年齡限制，導致民眾錯失及早發現的機會。</p>
+<p>導入 <span class="hl">RAG</span> 的 AI 客服：</p>
+<p>檢索： 系統立刻在最新的「癌症篩檢補助辦法」中搜尋，找到「45 歲至 74 歲民眾，每兩年可做一次免費定量免疫法糞便潛血檢查」。</p>
+<p>增強： 將最新條文與民眾的 55 歲條件結合。</p>
+<p>生成： AI 回答：「您好！根據最新規定，40 到 74 歲的民眾每兩年可進行一次免費篩檢。您今年 55 歲，完全符合資格喔！」 結果：提供 100% 正確的在地資訊，並帶有親切的服務溫度。</p>
+<p>情境二：醫院內部專案或業務管理</p>
+<p>在大型機構中，行政與專案執行的流程繁瑣且經常更新。一名專案導入助理詢問系統：「今年度引進新型健康照護設備，需要檢附哪些環境評估文件？」透過 <span class="hl">RAG</span> 技術，系統會直接進入內部的「2026 年度專案 SOP 資料夾」進行檢索，並將最新的表單名稱與流程，整理成列點式的清晰步驟回覆給人員。這不僅節省了翻找厚重檔案的時間，也避免了因為看錯舊版法規而導致專案退件的風險。</p>
+<h2>動手打造您的專屬 AI 助理 —— NotebookLM 實戰教學</h2>
+<p>理論聽起來很棒，但我們一般人不會寫程式，該怎麼體驗 <span class="hl">RAG</span> 的威力呢？Google 推出的 <span class="hl">NotebookLM</span> 就是為此而生的免費工具。它完美體現了 RAG 的概念，讓您無需任何程式背景，就能建立專屬的知識庫。</p>
+<p>您可以把 <span class="hl">NotebookLM</span> 想像成一個極度聰明且不知疲倦的超級助理。您可以將厚重的專案文件、營養學期刊或產品手冊丟給它，然後直接對它提問。</p>
+<p>實作步驟拆解：</p>
+<p>步驟一：建立您的專屬筆記本 (建立檔案室)</p>
+<p>使用 Google 帳號登入 <span class="hl">NotebookLM</span> 網站。</p>
+<p>點擊「新增筆記本 (New Notebook)」。這個筆記本就像是一個專屬的專案資料夾。</p>
+<p>步驟二：上傳資料來源 (把資料放進檔案櫃) 這是最關鍵的一步。您可以上傳多種格式的文件（如 PDF、Google 文件、文字檔、甚至 YouTube 網址）。</p>
+<div class="box"><div class="bt">📌 應用情境</div>假設您手邊有一份數十頁的「大腸直腸癌篩檢與防治實務指引」PDF 檔，或是您自己整理的「健康產品成分與功能分析」文件。請直接將這些文件拖曳上傳至 NotebookLM 的「來源 (Sources)」區塊。</div>
+<p>步驟三：開始與您的資料對話 (啟動檢索與生成) 文件上傳完成後，您會看到下方有一個對話框。這時，您不再是向全網搜尋，而是在跟「剛剛讀完這些文件的 AI 專家」對話。</p>
+<div class="box"><div class="bt">範例提問方式</div>「請根據這份指引，幫我整理出糞便潛血檢查呈現陽性時，後續的確診流程與建議的追蹤時間，並列點說明。」或「這項健康產品的主要專利成分是什麼？對應的適用族群有哪些？」</div>
+<p>步驟四：見證 <span class="hl">RAG</span> 的魔法 —— 查看「引用來源 (Citations)」 當 <span class="hl">NotebookLM</span> 給出流暢、有條理的回答時，您會發現答案的每一段後面都有小小的數字標號（例如 [1], [2]）。</p>
+<p>點擊這些數字： 系統會立刻在畫面上方跳出您上傳的原始 PDF 文件，並且用螢光筆標示出 AI 是參考了第幾頁、第幾段的內容來回答您的。</p>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 2px);color:#1a6644"><strong>這就是 RAG 的最強價值： 「有一分證據，說一分話。」您永遠可以追溯資料的源頭，徹底消除了 AI 幻覺的風險。</strong></p>
+<p>有了 <span class="hl">NotebookLM</span>，您在閒暇時不用再對著雜亂無章的資料發愁。您可以放點輕鬆的音樂，喝杯茶，把整理思緒、爬梳長篇大論的苦差事交給這個專屬助理，大幅提升吸收新知的效率。</p>
+<h3>總結與課後思考</h3>
+<p>總結來說，<span class="hl">RAG</span> 技術的出現，完美填補了<span class="hl">生成式 AI</span> 走向實用化與專業化的最後一哩路。它解決了幻覺問題、確保資訊即時更新，並完美保護了內部機密。</p>
+<p>未來，AI 不再只是陪我們聊天的工具，而是透過 <span class="hl">RAG</span> 技術（以及像 <span class="hl">NotebookLM</span> 這樣的優秀產品），成為真正懂您企業規則、熟悉您專案流程、並且永遠提供精確資訊的「最強專業助手」。</p>
+<h3 style="color:var(--bp);margin-top:18px">【課後自我檢測與思考】</h3>
+<ul>
+  <li><strong>觀念重塑：</strong>試著用「醫師與助理」的比喻，向身邊不懂電腦的朋友解釋什麼是 RAG。</li>
+  <li><strong>尋找應用場景：</strong>檢視您目前的工作或副業。有哪些經常需要翻找、核對的SOP、產品型錄或法規文件，是非常適合丟進 NotebookLM 讓它幫您整理的？</li>
+  <li><strong>資料品質的省思：</strong>既然 RAG 是基於我們提供的資料來回答（開卷考），如果我們上傳到 NotebookLM 的文件本身就是過時或錯誤的，AI 會給出正確答案嗎？這提醒了我們在日常的文件管理上，應該注意什麼？</li>
+</ul>
+<h2>附件一、 實戰案例教學指引</h2>
+<h3 style="color:var(--bp)">【實戰案例一】：大腸癌篩檢公衛指引諮詢</h3>
+<p><strong>場景目標：</strong>確保一線工作人員能精準回覆民眾關於篩檢資格與後續追蹤的疑問，避免因資訊過時導致誤判。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>衛福部最新版《大腸癌篩檢與追蹤實務手冊》。</li>
+  <li>院內針對「糞便潛血反應陽性者」的轉介流程 SOP。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「請根據上傳資料，整理出 2026 年最新補助的篩檢對象資格（年齡、頻率），並以表格呈現。」</li>
+  <li>指令 B： 「若民眾反映糞便潛血檢查為陽性，請列出後續確診建議的黃金時間，以及應安排的檢查項目。」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 2px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>透過「引用來源」功能，工作人員可直接對民眾出示官方文件段落，確保衛教資訊的權威性。</p>
+<h3 style="color:var(--bp)">【實戰案例二】：醫療設備導入與環境評估管理</h3>
+<p><strong>場景目標：</strong>協助專案管理人員在龐雜的行政法規中，快速定位特定設備導入所需的證明文件。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>環境保護署關於「醫療放射性廢棄物管理」的法規文件。</li>
+</ul>
+<p>醫院內部「2026 年度醫療儀器採購與安裝環境評估表」。</p>
+<ul>
+  <li>廠商提供的設備規格說明書（技術文件）。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「針對本次引進的 XX 型號放射性檢查設備，在安裝環境上需符合哪些法規規定的遮蔽標準？」</li>
+  <li>指令 B： 「請根據內部 SOP，列出申請安裝此設備時，行政流程中必須檢附的五項關鍵文件清單。」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 2px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>減少人工翻閱厚重法規的時間，並能自動對比「法規要求」與「設備規格」是否匹配。</p>
+<h3 style="color:var(--bp)">【實戰案例三】：臨床營養指引與個案飲食建議</h3>
+<p><strong>場景目標：</strong>協助醫事人員或營養師，根據最新醫學共識為特定族群（如肌少症高齡者）提供具備實證基礎的營養介入方案。</p>
+<p><strong>練習素材（上傳來源）：</strong></p>
+<ul>
+  <li>國際肌少症學會（EWGSOP2）最新共識報告。</li>
+  <li>高齡者膳食營養素參考攝取量（DRIs）最新修訂本。</li>
+  <li>院內常用營養品成分分析表。</li>
+</ul>
+<p><strong>實戰任務：</strong></p>
+<ul>
+  <li>指令 A： 「針對一位 75 歲、診斷為肌少症的男性，請根據指引計算其每日建議的蛋白質攝取總量（每公斤體重數值）。」</li>
+  <li>指令 B： 「比較現有上傳的三款營養補給品，哪一款最符合該個案在高量蛋白質且低含鈉量的營養需求？」</li>
+</ul>
+<p style="background:#eafaf1;border-left:3px solid var(--ok);padding:8px 12px;border-radius:0 6px 6px 0;font-size:calc(var(--fs) - 2px);color:#1a6644"><strong>✓ RAG 價值體現：</strong>解決生成式 AI 容易混淆各國營養指標的問題，強制 AI 僅能依據指定的「最新醫學指引」進行運算與比較。</p>
+<p>實作練習建議步驟</p>
+<p>為了達到最佳學習效果，建議在操作 <span class="hl">NotebookLM</span> 時遵循以下流程：</p>
+<ul>
+  <li><strong>資料預處理：</strong>確保上傳的 PDF 或文件非掃描影像檔（應為可選取文字的數位版），以利系統辨識。</li>
+  <li><strong>多來源詢問：</strong>同時上傳「法規」與「內部 SOP」，詢問兩者是否有衝突或需補強之處。</li>
+  <li><strong>引用查核：</strong>每當 AI 給出建議，請務必點擊後方的引文標記 [1]，確認 AI 擷取的段落是否完整，有無斷章取義。</li>
+</ul>
+  </div>
+</div>
+      </div>
+        </div>
+      </div>
+    </div>
+    <div id="rba" class="bc" style="display:none;margin-top:14px">
+      <button class="btn bp" onclick="startQ()">開始後測 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="screen" id="scQz">
+  <div class="ub" id="ub2"></div>
+  <div class="card">
+    <div class="ct">課後測驗</div>
+    <div class="qnav" id="qnav"></div>
+    <div class="qh">
+      <span class="qc" id="qcnt">第 1 題，共 10 題</span>
+      <span class="qa2" id="qans">已答：0 題</span>
+    </div>
+    <div class="qp"><div class="qpf" id="qpf" style="width:0%"></div></div>
+    <div id="qa"></div>
+    <div class="bc">
+      <button class="btn bo" id="bPrv" onclick="prevQ()" style="display:none">← 上一題</button>
+      <button class="btn bp" id="bNxt" onclick="nextQ()" style="display:none">下一題 →</button>
+      <button class="btn bk" id="bSub" onclick="cfmSub()" style="display:none">提交答案 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 3b RESULT -->
+<div class="screen" id="scRs">
+  <div class="ub" id="ub3"></div>
+  <div class="card">
+    <div class="rh" id="rh"></div>
+    <div class="rg" id="rg"></div>
+  </div>
+  <div class="card">
+    <div class="ct">答題明細</div>
+    <p style="font-size:12px;color:#88aacc;margin-bottom:12px">答錯的題目可點擊「查看解析」瞭解正確答案。</p>
+    <div id="rb"></div>
+    <div class="bc" style="margin-top:18px" id="rsBtnArea"></div>
+  </div>
+</div>
+
+<!-- STEP 4: 後測 -->
+<div class="screen" id="scPost">
+  <div class="ub" id="ubPost"></div>
+  <div class="card">
+    <div class="ct">課後後測</div>
+    <div class="ib">📝 完成講義閱讀後，請再次作答相同題目，看看您的理解是否有所提升！</div>
+    <div class="qh">
+      <span class="qc" id="postQcnt">第 1 題，共 10 題</span>
+      <span class="qa2" id="postQans">已答：0 題</span>
+    </div>
+    <div class="qp"><div class="qpf" id="postQpf" style="width:0%"></div></div>
+    <div id="postQa"></div>
+    <div class="bc">
+      <button class="btn bo" id="postBPrev" onclick="prevPostQ()" style="display:none">← 上一題</button>
+      <button class="btn bp" id="postBNext" onclick="nextPostQ()" style="display:none">下一題 →</button>
+      <button class="btn bk" id="postBSub" onclick="cfmPost()" style="display:none">提交後測 ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5: 課後問卷 -->
+<div class="screen" id="scSv">
+  <div class="ub" id="ub4"></div>
+  <div class="card">
+    <div class="ct">課後意見回饋問卷</div>
+    <p style="font-size:calc(var(--fs) - 1px);color:#88aacc;margin-bottom:20px">感謝您完成本次測驗！請撥冗填寫以下問卷，協助我們改善課程品質。</p>
+
+    <!-- 第1-5題：李克特量表 -->
+    <div style="margin-bottom:20px">
+      <div style="font-size:calc(var(--fs) - 1px);font-weight:700;color:var(--bd);margin-bottom:12px">請針對以下敘述，勾選最符合您實際感受的選項：</div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:calc(var(--fs) - 2px)">
+          <thead>
+            <tr style="background:var(--bp);color:#fff">
+              <th style="padding:8px 12px;text-align:left;border:1px solid var(--br);min-width:300px">評估項目</th>
+              <th style="padding:8px;text-align:center;border:1px solid var(--br);white-space:nowrap">非常滿意</th>
+              <th style="padding:8px;text-align:center;border:1px solid var(--br);white-space:nowrap">滿意</th>
+              <th style="padding:8px;text-align:center;border:1px solid var(--br);white-space:nowrap">普通</th>
+              <th style="padding:8px;text-align:center;border:1px solid var(--br);white-space:nowrap">不滿意</th>
+              <th style="padding:8px;text-align:center;border:1px solid var(--br);white-space:nowrap">非常不滿意</th>
+            </tr>
+          </thead>
+          <tbody id="svTableBody">
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 第6題：複選 -->
+    <div class="sq">
+      <div class="sqt">6. 未來如果繼續推出智慧醫療與科技應用相關的教材或培訓，您對下列哪些「進階主題」有興趣參與？（可複選）</div>
+      <div class="srg">
+        <label class="sr"><input type="checkbox" name="sq6" value="臺南愛腸篩平台實務"> 「臺南愛腸篩・轉診通」平台實務操作與疑難排解</label>
+        <label class="sr"><input type="checkbox" name="sq6" value="進階提示詞工程"> 進階提示詞工程（Prompt Engineering）在臨床衛教與關懷文案的應用</label>
+        <label class="sr"><input type="checkbox" name="sq6" value="醫療資訊安全"> 醫療資訊安全、個資保護法規與電子病歷合規實務</label>
+        <label class="sr"><input type="checkbox" name="sq6" value="醫學影像AI判讀"> 醫學影像 AI 判讀與基層診所分流實務演練</label>
+        <label class="sr"><input type="checkbox" name="sq6" value="其他" id="sq6Other"> 其他：<input type="text" id="sq6OtherText" style="border:none;border-bottom:1px solid var(--br);outline:none;width:200px;font-size:calc(var(--fs) - 2px);margin-left:4px" placeholder="請說明"></label>
+      </div>
+    </div>
+
+    <!-- 第7題：開放文字 -->
+    <div class="sq">
+      <div class="sqt">7. 請寫下您對本次「AI輔助工具」課程內容及呈現的建議，或對未來相關 AI 培訓的期望：</div>
+      <textarea class="sta" id="sq7" placeholder="請填寫您的建議……（選填）"></textarea>
+    </div>
+
+    <div id="svErr" style="color:var(--er);font-size:calc(var(--fs) - 2px);margin-top:8px;display:none">⚠ 請完成第 1–5 題評分後再提交</div>
+    <div class="bc"><button class="btn bk" onclick="subSv()">提交問卷 ✓</button></div>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="scDn">
+  <div class="card">
+    <div class="dw">
+      <div class="di">🎉</div>
+      <h2>感謝您的參與！</h2>
+      <p id="dInfo" style="margin-bottom:14px"></p>
+      <p>您的回饋將協助我們持續優化課程品質。</p>
+    </div>
+    <div class="bc"><button class="btn bo" onclick="window.print()">列印成績單 🖨️</button></div>
+  </div>
+</div>
+
+<script>
+
+// ══ SECURITY ══
+const _K=78;
+function _qa(q){const b=atob(q._a);return b.charCodeAt(0)^_K;}
+function _qe(q){const b=atob(q._e);const bytes=new Uint8Array(b.length);for(let i=0;i<b.length;i++)bytes[i]=b.charCodeAt(i)^_K;return new TextDecoder().decode(bytes);}
+// ── 音效 ──
+const AC=new(window.AudioContext||window.webkitAudioContext)();
+function _beep(f,d,t,v){t=t||'sine';v=v||0.25;try{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
+function sfxNext(){_beep(660,0.06);}
+function sfxSubmit(){[523,659,784,1046].forEach(function(f,i){setTimeout(function(){_beep(f,0.12);},i*90);});}
+function sfxLock(){_beep(150,0.4,'sawtooth',0.3);}
+function sfxDone(){[784,880,988,1046].forEach(function(f,i){setTimeout(function(){_beep(f,0.1,'triangle',0.18);},i*70);});}
+document.addEventListener('click',function(){if(AC.state==='suspended')AC.resume();},{once:true});
+// ── 防複製防右鍵 ──
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
+document.addEventListener('copy',function(e){e.preventDefault();});
+document.addEventListener('cut',function(e){e.preventDefault();});
+document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&['c','x','u','s','p'].indexOf(e.key.toLowerCase())>-1)e.preventDefault();if(e.key==='F12')e.preventDefault();});
+document.addEventListener('selectstart',function(e){var t=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].indexOf(t)===-1)e.preventDefault();});
+// ── Token ──
+var _tok=null,_tokUsed=false;
+function genToken(){_tok=Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);_tokUsed=false;}
+function validateToken(){if(!_tok||_tokUsed){showBlocked('Token 已失效，請重新填寫資料後再考試。');return false;}return true;}
+function burnToken(){_tokUsed=true;_tok=null;}
+// ── 次數限制 5次/24h ──
+var _RLK='exam_rl_m3';
+function _getRl(){try{var raw=localStorage.getItem(_RLK);return raw?JSON.parse(raw):{count:0,ts:0};}catch(e){return{count:0,ts:0};}}
+function checkRateLimit(){var rl=_getRl(),now=Date.now(),win=86400000;if(now-rl.ts>win)return true;if(rl.count>=5){var m=Math.ceil((win-(now-rl.ts))/60000);showBlocked('您今日已達考試上限（5次）。\n請於'+m+'分鐘後再試。');sfxLock();return false;}return true;}
+function recordAttempt(){var rl=_getRl(),now=Date.now(),win=86400000;if(now-rl.ts>win){rl={count:1,ts:now};}else{rl.count++;}localStorage.setItem(_RLK,JSON.stringify(rl));}
+function getRemaining(){var rl=_getRl(),now=Date.now();if(now-rl.ts>86400000)return 5;return Math.max(0,5-rl.count);}
+// ── 封鎖畫面 ──
+function showBlocked(msg){if(document.getElementById('blockOv'))return;document.body.insertAdjacentHTML('beforeend','<div id="blockOv" style="position:fixed;inset:0;background:rgba(10,22,40,.92);z-index:9999;display:flex;align-items:center;justify-content:center"><div style="background:#fff;border-radius:16px;padding:36px 32px;max-width:420px;text-align:center"><div style="font-size:48px;margin-bottom:12px">&#128274;</div><div style="font-size:16px;font-weight:700;color:#0d4a8a;margin-bottom:10px">存取受限</div><div style="font-size:14px;color:#555;white-space:pre-line;line-height:1.8">'+msg+'</div></div></div>');}
+// 回測偵測已停用
+var _examStarted=false;
+
+// font
+let fi=3;const fz=[13,14,15,16,17,18,20],fl2=["最小","小","中","預設","大","較大","最大"];
+function afs(d){fi=Math.max(0,Math.min(6,fi+d));document.documentElement.style.setProperty("--fs",fz[fi]+"px");document.getElementById("fsl").textContent=fl2[fi];}
+
+// steps
+function sStep(n){[1,2,3,4,5].forEach(i=>{const e=document.getElementById("sp"+i),c=e.querySelector(".sc");e.className="st"+(i<n?" done":i===n?" active":"");c.textContent=i<n?"✓":i;});}
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
+
+// user
+let ud={};
+function ubH(){return `<span><strong>診所：</strong>${ud.cl}</span><span><strong>代碼：</strong>${ud.or}</span><span><strong>姓名：</strong>${ud.nm}</span><span><strong>職稱：</strong>${ud.ti}</span>`;}
+
+// reg
+function subReg(){
+  const c=document.getElementById("fCl").value.trim(),o=document.getElementById("fOr").value.trim(),n=document.getElementById("fNm").value.trim(),t=document.getElementById("fTi").value;
+  if(!c||!o||!n||!t){document.getElementById("rErr").style.display="block";return;}
+  document.getElementById("rErr").style.display="none";
+  ud={cl:c,or:o,nm:n,ti:t};
+  document.getElementById("ubPre").innerHTML=ubH();
+  sStep(2);show("scPre");initPreQ();
+}
+
+// reading
+var sd=[false];
+function onSc(n){} // replaced by slideshow
+function chkRd(){document.getElementById("rba").style.display=sd[0]?"flex":"none";}
+function toggleExt(n){
+  var el=document.getElementById("ext"+n),ic=document.getElementById("ext"+n+"icon");
+  var open=el.style.display==="none";
+  el.style.display=open?"block":"none";
+  ic.style.transform=open?"rotate(180deg)":"rotate(0deg)";
+}
+
+// quiz
+const PRE_QS=[
+  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"TA==",_e:"qdrRqMbeq/LBbg8Hbqr2w6jSzavA9ab9yajY16v05aje0qv+xanB8KjG3qrx76r1+KHywqbOwqjW4aju96jd1Kvj9qnx3KvG/qnUyqbk0KbmzqbowavHyanb+Kr2xa3Owqna0ajG3q3Ow6vL5qjY/qvL6avg963OzA=="},
+  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"Tw==",_e:"q8z9qfv/bg8HofLGq8bqq8brq/LBbg8HofLHqN3Lp9v5rc7CqMfwpujBq/DFq9zCq8/Uq8bIp+/Qrc7DofLCqvDFq+jMqfzwqPTYq8bqq8brbhZuq8vHqcfJqNbhq97oqNLHqdv+q/b2rc7M"},
+  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"Tw==",_e:"q8z9qfv/bg8HbqvB5KbN86vw0KjZ7KjSx6fP9qfuy6jH8Knj2qjvxqHywqr2w6jSza3OwqvH+6fO7q3Ow6r2w6vj1qvS5qnUyqjT/6br8a3OzA=="},
+  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"Tw==",_e:"AgIDbqfT7qbmxqng2a3Owqr2xar2zqvOxavj2anUyqjn0anAya3Ow6Hywqr2zqvOxavj2ar2zqvOxavj2a3OwqjA663Ow6vJ9KvL6avg963OzA=="},
+  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"TA==",_e:"qMDCqMHvbgkrIG4PB26o1uGm6M+m4N2myeSr+f+oxt6pzPSnzO2rzsWtzsKoycyr8NmowsmoweBuDwduqdTKqfbzqeDvrc7Drc7M"},
+  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"Tw==",_e:"DwduqdTKqdHrpuPWq8/SqdvXq9Lmpubdqfn6qNfMp9jdp/XQofLCpufsq9vBqNLOqNj+qP3bpujBqNLNp8/Jq8b+pv3JpubErc7CqNfMp9jdq/ngrc7Dq9vBp+/Crc7M"},
+  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"Tw==",_e:"qenfq+P2q+D4p9jFqdfyq8n0bhwPCaHyxhwrOjwnKzgvImMPOykjKyA6KypuCSsgKzwvOichIKHywqjk7Kn67Kvs0Kvy+ana0ajG3qHyx6rwyKbp7aj/9G4PB26p1Mqq9ser6umr8v+n9dCtzsw="},
+  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"Tw==",_e:"ACE6KywhISUCA26o1uFuCSEhKSIrbqjA5qvJ9KnUyqvLw6b89W4cDwluq/nrq8v5ofLCqcrvp9LOqebFq/LBps3CqNfhq8P9q8Hhq/X0qeXFq/7Gq//iqdHrpuPWq/Tlrc7M"},
+  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"TA==",_e:"HA8Jbqrw06r2xKvM/ab9yajY16vV0Knj2qHywqbF66b9yajY16jS4qb05afC4abk6qHywg8Hbqr1w6jSzan76KvJ9KfC4abk6qnj2qjvxq3OzA=="},
+  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"TA==",_e:"qObvqfvKbgN9bqnUyqju9qvxzan88Knr0KHy1K3OwqnSxajJzKv39abo9KHywqn88Kj02KjB3qvbwaHywqjH3afO7qv+xqv/4qvq6abL6K3OzK3Oww=="}
+]
+const QS=[
+  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"TA==",_e:"qdrRqMbeq/LBbg8Hbqr2w6jSzavA9ab9yajY16v05abt76je0qv+xanB8KjG3qrx76r1+Kbqyabt86b88qr2xKHywqbOwqjW4aju96jd1Kvgzavj9qnx3KvG/qnUyqbk0KbmzqbowavHyavcwqfMwaby4aHywqnb+Kr2xa3Owqna0ajG3q3Ow6vJ9Kr2zqvOxavL5qr22KnbwqnD5qr2zqnK76r0wqnUyqvL5qjY/qvL6avg963OzA=="},
+  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"Tw==",_e:"q8z9qfv/qdTKbg8HofLGqvfRq/7/qNbhq8bqq8brq/LBbg8HofLHp9PQq/b2qN3Lp9v5rc7CqMfwpujBq/DFrc7Dq9zCrc7Cq8/Uq8bIp+/Qrc7DofLCqvDFq+jMqfzwqPTYq8bqq8brbhary8epx8mo1uGr3uio0sep2/6r9vatzsw="},
+  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"Tw==",_e:"q8z9qfv/bg8HbqnUyqv566rz0qju9qvxzajW4avw0KjZ7KjSx6fP9qfuy6r246jH8KvJ9Knj2qjvxqHywqvgzavO36r2w6jSza3OwqvH+6fO7q3Ow6r2w6vj1qvS5qnUyqjT/6br8aHy1abN863Owqna0ajG3q3Ow6vL5qjY/qvL6avg96nUyqjW4ana0ajG3qvywW4PB63OzA=="},
+  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"Tw==",_e:"AgIDbqfT7qbmxqng2a3Owqr2xar2zqvOxavj2anUyqjn0anAya3Ow6Hywqr2zqvOxavj2ar2zqvOxavj2a3OwqjA663Ow6vJ9KvL6avg963OzA=="},
+  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"TA==",_e:"qMDCqMHvbgkrIG4PB26q9sOo1uGm6M+m4N1uDwduq8HYqvXtqMbfq87fofLCps7CqNbhpujPpuDdpsnkq/n/qMbeqcz0p8ztq87Frc7CqMnMq/DZqMLJqMHgbg8HbqnUyqn286ng763Ow63OzA=="},
+  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"Tw==",_e:"DwduqdTKqdHrpuPWqvDIpsnkqNjyq+DNpuzlpubdqfn6qdTKp8ztqOD7qNfMp9jdrc7Mq+jMqNDSq+DNqdTKpubWqMj4q8/SqdvXq9Lmbnx+fH1uq/f6ofLCpufsq9vBbnx+fHhuq/f6qdTKqNLOqNj+qP3bpujBq/7/qNLNp8/Jq8b+pv3JpubEqNX6qNj+qdTKrc7CqNfMp9jdq/ngrc7Dq9vBp+/Crc7M"},
+  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"Tw==",_e:"qcz0qvTIpuntqP/0p87XqvTVqdnVp/XQofLCqenfq+P2q+D4p9jFqdfyq8n0qvTIqvbOq+vZq8vmqNj+qdTKq8PaqvPSqOfRq8b4rM7aHA8JofLGHCs6PCcrOC8iYw87KSMrIDorKm4JKyArPC86JyEgofLCqOTsqfrsq+zQq/L5qdrRqMbeofLHrc7M"},
+  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"Tw==",_e:"CSEhKSIrbqjA5qvJ9KnUym4AITorLCEhJQIDbqjW4anM9Kjj6qbOwqna0anUyqvLw6b89av566vL+aHywqvgwqnwwKfl2qnB8G4cDwluqOjMq/H7ofLCpuDdqMzmqcrvp9LOqvX1qvPbqebFq/LBps3CqNfhq/7/ps3zq/X0qeXFq/7Gq//iqdHrpuPWq/Tlrc7M"},
+  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"TA==",_e:"qNnsqcr4bhwPCW6o1uGr0fSo2PKoxt+rzt+owd6q8NWp1Mqm/cmo2Neq8Mir1dCp49qh8san2MWrw/mmzs2h8seh8sKr6Myo0NKq9sSrzP2p1Mqo2Mmq9fio0uKm9OWnz8Co18yoxtinwuGm5Oqh8sIPB26nzMqo1uGo0s2q8NOo3dSo4+qp++iryfSnwuGm5Oqp1Mqp49qo78ah8sKnzteowd6nyNyoxt+rzt+o2eur9vao2Mmq9fip4O+p3sip1MqnycOm6M+ozumtzsw="},
+  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"TA==",_e:"qObvqfvKbgN9bqbk/KnmxanUyqju9qvxzan88Knr0KnM9KHy1K3OwqnSxajJzKv39abo9KHywqn88Kj02KjB3qvbwaHywqjH3afO7qv+xqv/4qvq6abL6K3OzK3Oww=="}
+]
+const K=["A","B","C","D"];
+let cq=0,ans=new Array(10).fill(null),tmI,t0;
+
+function startQ(){
+  initPostQ();
+}
+function startTm(){
+  clearInterval(tmI);let r=1200;document.getElementById("tmb").style.display="";
+  tmI=setInterval(()=>{r--;const tv=String(Math.floor(r/60)).padStart(2,"0")+":"+String(r%60).padStart(2,"0");document.getElementById("tmv").textContent=tv;const s2=document.getElementById("tmb2");if(s2)s2.textContent=tv;if(r<=0){clearInterval(tmI);burnToken();_examStarted=false;showRs();}},1000);
+}
+function renderNav(){
+  const mk=(id)=>{const n=document.getElementById(id);if(!n)return;n.innerHTML=QS.map((_,i)=>`<button class='qnb${i===cq?"' style='background:var(--bp);border-color:var(--bp);color:#fff'":ans[i]!==null?"' style='background:var(--bl);border-color:var(--bp);color:var(--bp)'":"'"} onclick='goQ(${i})'>${i+1}</button>`).join('');};
+  mk('qnav');mk('qnavSide');
+}
+function renderQ(){
+  renderNav();const q=QS[cq],ua=ans[cq];
+  document.getElementById("qcnt").textContent="第 "+(cq+1)+" 題，共 "+QS.length+" 題";
+  document.getElementById("qans").textContent="已答："+ans.filter(a=>a!==null).length+" 題";
+  document.getElementById("qpf").style.width=(cq/QS.length*100)+"%";
+  document.getElementById("qa").innerHTML=`<div class="qt"><span class="qn">Q${cq+1}</span>${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt${i===ua?" sel":""}" onclick="selO(${i})"><div class="ok2">${K[i]}</div><div class="ot">${o}</div></div>`).join("")}</div>`;
+  document.getElementById("bPrv").style.display=cq>0?"":"none";
+  document.getElementById("bNxt").style.display=cq<QS.length-1?"":"none";
+  document.getElementById("bSub").style.display=cq===QS.length-1?"":"none";
+}
+var _advancing=false;
+function selO(i){
+  if(_advancing)return;
+  ans[cq]=i;renderQ();sfxNext();
+  if(cq<QS.length-1){
+    _advancing=true;
+    setTimeout(function(){cq++;renderQ();_advancing=false;},380);
+  }
+}
+function goQ(i){cq=i;renderQ();}
+function nextQ(){if(cq<QS.length-1){cq++;renderQ();}}
+function prevQ(){if(cq>0){cq--;renderQ();}}
+function cfmSub(){
+  var u=ans.filter(function(a){return a===null;}).length;
+  if(u>0&&!confirm("您還有 "+u+" 題尚未作答，確定要提交嗎？"))return;
+  burnToken();_examStarted=false;
+  clearInterval(tmI);document.getElementById("tmb").style.display="none";
+  sfxSubmit();setTimeout(showRs,600);
+}
+function showRs(){
+  clearInterval(tmI);document.getElementById("tmb").style.display="none";
+  _examStarted=false;sfxDone();
+  const el=Math.round((Date.now()-t0)/1000),sc=ans.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=8;
+  document.getElementById("ub3").innerHTML=ubH();
+  document.getElementById("rh").innerHTML=`<div class="rc2 ${pass?"rcp":"rcf"}"><div class="rsn2">${sc}</div><div class="rd">/ ${QS.length}</div></div><div class="rti">${pass?"🎉 恭喜通過測驗！":"📚 建議複習講義後再試"}</div><div class="rsu">${ud.nm}・${ud.ti}・${ud.cl}</div>`;
+  document.getElementById("rg").innerHTML=`<div class="rst"><div class="rsn">${sc}</div><div class="rsl">答對題數</div></div><div class="rst"><div class="rsn">${Math.round(sc/QS.length*100)}%</div><div class="rsl">得分率</div></div><div class="rst"><div class="rsn">${Math.floor(el/60)}′${String(el%60).padStart(2,"0")}″</div><div class="rsl">作答時間</div></div>`;
+  document.getElementById("rb").innerHTML=QS.map((q,i)=>{
+    const ok=ans[i]===_qa(q),uo=ans[i]!==null?K[ans[i]]:"未作答";
+    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap"><span style="color:var(--er);font-size:12px">您選：${uo}</span><span style="color:#aaa;font-size:12px">→</span><span style="color:var(--ok);font-size:12px">正確：${K[_qa(q)]}</span><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
+  }).join("");
+  // 依通過/未通過決定按鈕
+  var btnHtml;
+  if(pass){
+    btnHtml='<button class="btn bo" onclick="retake()">重新作答</button>'
+           +'<button class="btn bp" onclick="goSv()">填寫課後問卷 →</button>';
+  } else {
+    btnHtml='<div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%">'
+           +'<div style="background:#fff8e1;border:1px solid #f5a623;border-radius:var(--rs);padding:12px 20px;font-size:calc(var(--fs) - 1px);color:#7a5c00;text-align:center;max-width:440px">'
+           +'📚 本次測驗未達及格標準（80分），請複習講義後重新作答。'
+           +'</div>'
+           +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
+           +'<button class="btn bo" onclick="goReview()">← 回去複習講義</button>'
+           +'<button class="btn bp" onclick="retake()">重新作答</button>'
+           +'</div>'
+           +'</div>';
+  }
+  document.getElementById("rsBtnArea").innerHTML=btnHtml;
+  show("scRs");
+}
+function tExp(i){const e=document.getElementById("ex"+i),b=e.previousElementSibling.querySelector(".btgl"),s=e.classList.toggle("show");b.textContent=s?"收起解析":"查看解析";}
+function retake(){if(!checkRateLimit())return;genToken();recordAttempt();_examStarted=true;clearInterval(tmI);document.getElementById("tmb").style.display="none";ans=new Array(10).fill(null);cq=0;t0=Date.now();startTm();show("scQz");renderQ();sfxNext();}
+
+// ── 前測 ──
+var preAns=new Array(10).fill(null), preCq=0, _preAdvancing=false;
+function initPreQ(){preCq=0;preAns=new Array(10).fill(null);renderPreQ();}
+function renderPreQ(){
+  const q=PRE_QS[preCq],ua=preAns[preCq];
+  document.getElementById("preQcnt").textContent="第 "+(preCq+1)+" 題，共 "+PRE_QS.length+" 題";
+  document.getElementById("preQans").textContent="已答："+preAns.filter(a=>a!==null).length+" 題";
+  document.getElementById("preQpf").style.width=(preCq/PRE_QS.length*100)+"%";
+  document.getElementById("preQa").innerHTML=`<div class="qt"><span class="qn">Q${preCq+1}</span>${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt${i===ua?" sel":""}" onclick="selPreOpt(${i})"><div class="ok2">${["A","B","C","D"][i]}</div><div class="ot">${o}</div></div>`).join("")}</div>`;
+  document.getElementById("preBPrev").style.display=preCq>0?"":"none";
+  document.getElementById("preBNext").style.display=preCq<PRE_QS.length-1?"":"none";
+  document.getElementById("preBSub").style.display=preCq===PRE_QS.length-1?"":"none";
+}
+function selPreOpt(i){
+  if(_preAdvancing)return;
+  preAns[preCq]=i;renderPreQ();sfxNext();
+  if(preCq<PRE_QS.length-1){_preAdvancing=true;setTimeout(function(){preCq++;renderPreQ();_preAdvancing=false;},380);}
+}
+function prevPreQ(){if(preCq>0){preCq--;renderPreQ();}}
+function nextPreQ(){if(preCq<PRE_QS.length-1){preCq++;renderPreQ();}}
+function submitPre(){
+  // 前測不計分，直接進閱讀
+  document.getElementById("ub1").innerHTML=ubH();
+  genToken();
+  sStep(3);show("scRd");
+  sfxNext();
+}
+
+// ── 後測 ──
+var postAns=new Array(10).fill(null), postCq=0, _postAdvancing=false, postT0;
+function initPostQ(){
+  if(!checkRateLimit())return;
+  if(!validateToken())return;
+  recordAttempt();_examStarted=true;
+  postCq=0;postAns=new Array(10).fill(null);postT0=Date.now();
+  document.getElementById("ubPost").innerHTML=ubH()+'<span style="margin-left:auto;font-size:12px;color:#888">今日剩餘次數：'+getRemaining()+'</span>';
+  startTm();sStep(4);show("scPost");renderPostQ();sfxNext();
+}
+function renderPostQ(){
+  const q=QS[postCq],ua=postAns[postCq];
+  document.getElementById("postQcnt").textContent="第 "+(postCq+1)+" 題，共 "+QS.length+" 題";
+  document.getElementById("postQans").textContent="已答："+postAns.filter(a=>a!==null).length+" 題";
+  document.getElementById("postQpf").style.width=(postCq/QS.length*100)+"%";
+  // reuse qnav for post
+  document.getElementById("postQa").innerHTML=`<div class="qt"><span class="qn">Q${postCq+1}</span>${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt${i===ua?" sel":""}" onclick="selPostOpt(${i})"><div class="ok2">${["A","B","C","D"][i]}</div><div class="ot">${o}</div></div>`).join("")}</div>`;
+  document.getElementById("postBPrev").style.display=postCq>0?"":"none";
+  document.getElementById("postBNext").style.display=postCq<QS.length-1?"":"none";
+  document.getElementById("postBSub").style.display=postCq===QS.length-1?"":"none";
+}
+function selPostOpt(i){
+  if(_postAdvancing)return;
+  postAns[postCq]=i;renderPostQ();sfxNext();
+  if(postCq<QS.length-1){_postAdvancing=true;setTimeout(function(){postCq++;renderPostQ();_postAdvancing=false;},380);}
+}
+function prevPostQ(){if(postCq>0){postCq--;renderPostQ();}}
+function nextPostQ(){if(postCq<QS.length-1){postCq++;renderPostQ();}}
+function cfmPost(){
+  const u=postAns.filter(a=>a===null).length;
+  if(u>0&&!confirm("您還有 "+u+" 題尚未作答，確定要提交嗎？"))return;
+  burnToken();_examStarted=false;
+  clearInterval(tmI);document.getElementById("tmb").style.display="none";
+  sfxSubmit();setTimeout(showPostRs,600);
+}
+function showPostRs(){
+  clearInterval(tmI);document.getElementById("tmb").style.display="none";
+  _examStarted=false;sfxDone();
+  const el=Math.round((Date.now()-postT0)/1000),sc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=8;
+  // 計算前測分數
+  const preSc=preAns.reduce((a,v,i)=>a+(v===_qa(PRE_QS[i])?1:0),0);
+  document.getElementById("ub3").innerHTML=ubH();
+  document.getElementById("rh").innerHTML=`
+    <div class="rc2 ${pass?"rcp":"rcf"}"><div class="rsn2">${sc}</div><div class="rd">/ ${QS.length}</div></div>
+    <div class="rti">${pass?"🎉 恭喜通過後測！":"📚 建議複習講義後再試"}</div>
+    <div class="rsu">${ud.nm}・${ud.ti}・${ud.cl}</div>
+    <div style="display:flex;gap:16px;justify-content:center;margin-top:12px;flex-wrap:wrap">
+      <div style="background:var(--gl);border-radius:var(--rs);padding:8px 18px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)">
+        <span style="color:#88aacc">前測：</span><strong style="color:var(--bd)">${preSc} / ${PRE_QS.length}</strong>
+        <span style="color:#88aacc;margin-left:4px">(${Math.round(preSc/PRE_QS.length*100)}%)</span>
+      </div>
+      <div style="background:var(--gl);border-radius:var(--rs);padding:8px 18px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)">
+        <span style="color:#88aacc">後測：</span><strong style="color:${pass?"var(--ok)":"var(--er)"}">${sc} / ${QS.length}</strong>
+        <span style="color:#88aacc;margin-left:4px">(${Math.round(sc/QS.length*100)}%)</span>
+      </div>
+      ${sc>preSc?`<div style="background:#eafaf1;border-radius:var(--rs);padding:8px 18px;border:1px solid #a3d9b1;font-size:calc(var(--fs) - 1px);color:var(--ok)">📈 進步了 ${sc-preSc} 題！</div>`:""}
+    </div>`;
+  document.getElementById("rg").innerHTML=`
+    <div class="rst"><div class="rsn">${sc}</div><div class="rsl">後測答對</div></div>
+    <div class="rst"><div class="rsn">${Math.round(sc/QS.length*100)}%</div><div class="rsl">後測得分率</div></div>
+    <div class="rst"><div class="rsn">${Math.floor(el/60)}′${String(el%60).padStart(2,"0")}″</div><div class="rsl">作答時間</div></div>`;
+  // 答題明細
+  const bd=QS.map((q,i)=>{
+    const ok=postAns[i]===_qa(q),uo=postAns[i]!==null?["A","B","C","D"][postAns[i]]:"未作答";
+    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap"><span style="color:var(--er);font-size:calc(var(--fs) - 2px)">您選：${uo}</span><span style="color:#aaa">→</span><span style="color:var(--ok);font-size:calc(var(--fs) - 2px)">正確：${["A","B","C","D"][_qa(q)]}</span><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
+  }).join("");
+  document.getElementById("rb").innerHTML=bd;
+  var btnHtml;
+  if(pass){
+    btnHtml='<button class="btn bo" onclick="retakePost()">重新後測</button>'
+           +'<button class="btn bp" onclick="goSv()">填寫課後問卷 →</button>';
+  } else {
+    btnHtml='<div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%">'
+           +'<div style="background:#fff8e1;border:1px solid #f5a623;border-radius:var(--rs);padding:12px 20px;font-size:calc(var(--fs) - 1px);color:#7a5c00;text-align:center;max-width:440px">'
+           +'📚 本次後測未達及格標準（80分），請複習講義後重新作答。'
+           +'</div>'
+           +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
+           +'<button class="btn bo" onclick="goReview()">← 回去複習講義</button>'
+           +'<button class="btn bp" onclick="retakePost()">重新後測</button>'
+           +'</div>'
+           +'</div>';
+  }
+  document.getElementById("rsBtnArea").innerHTML=btnHtml;
+  show("scRs");
+}
+function retakePost(){
+  if(!checkRateLimit())return;
+  genToken();recordAttempt();_examStarted=true;
+  clearInterval(tmI);document.getElementById("tmb").style.display="none";
+  postAns=new Array(10).fill(null);postCq=0;postT0=Date.now();startTm();
+  show("scPost");renderPostQ();sfxNext();
+}
+
+// ── 問卷表格 ──
+var svRatings=[null,null,null,null,null]; // Q1-Q5 李克特
+var svLabels=["非常滿意","滿意","普通","不滿意","非常不滿意"];
+var svItems=[
+  "1. 本次課程內容與觀念（如 AI 操作、提示詞技巧）能與您的日常工作進行良好結合。",
+  "2. 您對於本次課程「教材內容」的實用性與完整性感到滿意。",
+  "3. 您對於本次課程「以簡報掌握重點、再輔以文件深入閱讀」的教材安排方式感到滿意。",
+  "4. 本教材有助於我理解 LLM（大型語言模型）的基本運作，以及 RAG（檢索增強生成）如何減少 AI 幻覺。",
+  "5. 透過本套自學教材的引導，提升了您未來在工作上操作或應用 AI 工具的信心。"
+];
+function initSvTable(){
+  svRatings=[null,null,null,null,null];
+  var tbody=document.getElementById("svTableBody");
+  tbody.innerHTML=svItems.map((item,qi)=>`
+    <tr style="background:${qi%2===0?"var(--gl)":"#fff"}">
+      <td style="padding:8px 12px;border:1px solid var(--br);font-size:calc(var(--fs) - 2px);line-height:1.5">${item}</td>
+      ${[0,1,2,3,4].map(ri=>`<td style="padding:8px;border:1px solid var(--br);text-align:center"><label style="cursor:pointer;display:flex;justify-content:center"><input type="radio" name="svq${qi}" value="${ri}" onchange="setSvRating(${qi},${ri})" style="accent-color:var(--bp);width:16px;height:16px"></label></td>`).join("")}
+    </tr>`).join("");
+}
+function setSvRating(qi,ri){svRatings[qi]=ri;}
+
+let sv={1:0,2:0};const slab=["","非常不滿意","不滿意","普通","滿意","非常滿意"];
+function setStar(g,v){sv[g]=v;document.getElementById("st"+g).querySelectorAll(".star").forEach((s,i)=>s.className="star"+(i<v?" lit":""));document.getElementById("sl"+g).textContent=slab[v];}
+document.querySelectorAll(".sr").forEach(l=>{const inp=l.querySelector("input");inp.addEventListener("change",()=>{if(inp.type==="radio")document.querySelectorAll(`input[name="${inp.name}"]`).forEach(r=>r.closest(".sr").classList.toggle("sel",r.checked));else l.classList.toggle("sel",inp.checked);});});
+function goSv(){sStep(5);document.getElementById("ub4").innerHTML=ubH();show("scSv");initSvTable();}
+function subSv(){
+  if(svRatings.some(r=>r===null)){document.getElementById("svErr").style.display="block";return;}
+  document.getElementById("svErr").style.display="none";
+  const postSc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0);
+  const preSc=preAns.reduce((a,v,i)=>a+(v===_qa(PRE_QS[i])?1:0),0);
+  document.getElementById("dInfo").textContent=`${ud.nm} 您好，前測 ${preSc}分 → 後測 ${postSc}分（${Math.round(postSc/QS.length*100)}%）。感謝您的填寫！`;
+  show("scDn");
+}
+
+// ── Slideshow ──
+var _totalSlides = 15;
+var _curSlide = 0;
+
+function goSlide(n) {
+  var prev = document.getElementById('slide' + (_curSlide + 1));
+  if (prev) prev.style.display = 'none';
+  _curSlide = Math.max(0, Math.min(_totalSlides - 1, n));
+  var cur = document.getElementById('slide' + (_curSlide + 1));
+  if (cur) cur.style.display = 'flex';
+  // update dots
+  document.querySelectorAll('.sl-dot').forEach(function(d, i) {
+    d.classList.toggle('on', i === _curSlide);
+  });
+  // update counter
+  var ctr = document.getElementById('slCounter');
+  if (ctr) ctr.textContent = (_curSlide + 1) + ' / ' + _totalSlides;
+  // update buttons
+  var bp = document.getElementById('slPrev');
+  var bn = document.getElementById('slNext');
+  if (bp) bp.disabled = _curSlide === 0;
+  if (bn) {
+    if (_curSlide === _totalSlides - 1) {
+      bn.textContent = '完成閱讀 ✓';
+      bn.onclick = function() { markSlidesDone(); };
+    } else {
+      bn.textContent = '下一頁 →';
+      bn.onclick = function() { goSlide(_curSlide + 1); };
+    }
+  }
+}
+
+function markSlidesDone() {
+  sd[0] = true;
+  var dm = document.getElementById('dm1');
+  if (dm) dm.style.display = 'flex';
+  chkRd();
+  sfxDone();
+}
+
+// keyboard nav
+document.addEventListener('keydown', function(e) {
+  var sc = document.getElementById('scRd');
+  if (!sc || !sc.classList.contains('active')) return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goSlide(_curSlide + 1);
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goSlide(_curSlide - 1);
+});
+
+</script>
+</body>
+</html>
