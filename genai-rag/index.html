@@ -1349,66 +1349,73 @@ document.addEventListener('keydown', function(e) {
 // ══ Google Sheets API ══
 const _API = "https://script.google.com/macros/s/AKfycbwZnh7M436rw16VC0X1VVSVzWG5R2gTTcKWw7FS3z3OPwUkfFCvngUfVuX2upVcVD9s/exec";
 
-function _post(payload, onOk, onErr) {
-  fetch(_API, {
-    method: "POST",
-    mode: "no-cors",  // GAS Web App 不支援 CORS，用 no-cors
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  }).then(function() {
-    if (onOk) onOk();
-  }).catch(function(err) {
-    console.error("API error:", err);
-    if (onErr) onErr(err);
-  });
-}
-
-function submitScoreToSheet() {
-  // 將答案索引轉成選項字母 A/B/C/D
-  const K = ["A","B","C","D"];
-  const preLetters = preAns.map(function(a) { return a !== null ? K[a] : ""; });
-  const postLetters = postAns.map(function(a) { return a !== null ? K[a] : ""; });
-  const preSc  = preAns.reduce(function(acc,v,i){return acc+(v===_qa(PRE_QS[i])?1:0);},0);
-  const postSc = postAns.reduce(function(acc,v,i){return acc+(v===_qa(QS[i])?1:0);},0);
-
-  _post({
-    action: "SUBMIT_SCORE",
-    clinicName: ud.cl,
-    clinicCode: ud.or,
-    userName:   ud.nm,
-    userTitle:  ud.ti,
-    preAnswers:  preLetters,
-    postAnswers: postLetters,
-    preScore:  preSc,
-    postScore: postSc
-  });
-}
-
-function submitSurveyToSheet(preSc, postSc) {
-  const svLabels = ["非常滿意","滿意","普通","不滿意","非常不滿意"];
-  const q6Checked = Array.from(document.querySelectorAll("input[name=sq6]:checked"))
-                        .map(function(el){return el.value;}).join("、");
-  const q6OtherEl = document.getElementById("sq6OtherText");
-  const q6Other = (document.getElementById("sq6Other") && document.getElementById("sq6Other").querySelector("input[type=checkbox]") && document.getElementById("sq6Other").querySelector("input[type=checkbox]").checked && q6OtherEl) ? q6OtherEl.value : "";
-  const q6Final = q6Checked + (q6Other ? "（其他："+q6Other+"）" : "");
-  const q7 = document.getElementById("sq7") ? document.getElementById("sq7").value : "";
-
-  _post({
-    action: "SUBMIT_SURVEY",
-    clinicName: ud.cl,
-    clinicCode: ud.or,
-    userName:   ud.nm,
-    userTitle:  ud.ti,
-    preScore:   preSc,
-    postScore:  postSc,
-    q1_fit:           svLabels[svRatings[0]],
-    q2_practical:     svLabels[svRatings[1]],
-    q3_schedule:      svLabels[svRatings[2]],
-    q4_comprehension: svLabels[svRatings[3]],
-    q5_confidence:    svLabels[svRatings[4]],
-    q6_interests:     q6Final,
-    q7_feedback:      q7
-  });
+function doPost(e) {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var data = JSON.parse(e.postData.contents);
+    
+    // 1. 處理測驗成績記錄
+    if (data.action === 'SUBMIT_SCORE') {
+      var sheet = ss.getSheetByName('成績記錄');
+      if (!sheet) return ContentService.createTextOutput("錯誤：找不到『成績記錄』工作表");
+      
+      var nextRow = sheet.getLastRow() + 1;
+      var rowData = [];
+      
+      rowData[0] = nextRow - 4;          // A欄：序號
+      rowData[1] = new Date();           // B欄：考試日期
+      rowData[2] = data.clinicName || ""; // C欄：診所名稱
+      rowData[3] = data.clinicCode || ""; // D欄：機構代碼
+      rowData[4] = data.userName || "";   // E欄：姓名
+      rowData[5] = data.userTitle || "";  // F欄：職稱
+      
+      // G欄 到 P欄：前測答案
+      for (var i = 0; i < 10; i++) {
+        rowData[6 + i] = (data.preAnswers && data.preAnswers[i]) ? data.preAnswers[i] : "";
+      }
+      // Q欄 到 Z欄：後測答案
+      for (var j = 0; j < 10; j++) {
+        rowData[16 + j] = (data.postAnswers && data.postAnswers[j]) ? data.postAnswers[j] : "";
+      }
+      // AA欄 到 AE欄 留空讓公式計算
+      for (var k = 0; k < 5; k++) {
+        rowData[26 + k] = "";
+      }
+      
+      sheet.getRange(nextRow, 1, 1, rowData.length).setValues([rowData]);
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"}));
+    }
+    
+    // 2. 處理課後問卷 (配合 exam_21.html 欄位名)
+    else if (data.action === 'SUBMIT_SURVEY') {
+      var sheet = ss.getSheetByName('課後問卷');
+      if (!sheet) return ContentService.createTextOutput("錯誤：找不到『課後問卷』工作表");
+      
+      var nextRow = sheet.getLastRow() + 1;
+      
+      sheet.appendRow([
+        nextRow - 2,             // A欄：序號
+        new Date(),               // B欄：填寫日期
+        data.clinicName || "",    // C欄：診所名稱
+        data.clinicCode || "",    // D欄：機構代碼
+        data.userName || "",      // E欄：姓名
+        data.userTitle || "",     // F欄：職稱
+        data.preScore !== undefined ? data.preScore : "",  // G欄：前測分數
+        data.postScore !== undefined ? data.postScore : "",// H欄：後測分數
+        data.sq1 || "",           // I欄：Q1 結合度
+        data.sq2 || "",           // J欄：Q2 實用性
+        data.sq3 || "",           // K欄：Q3 安排方式
+        data.sq4 || "",           // L欄：Q4 理解度
+        data.sq5 || "",           // M欄：Q5 AI信心
+        data.sq6 || "",           // N欄：Q6 進階興趣
+        data.sq7 || ""            // O欄：Q7 建議與期望
+      ]);
+      
+      return ContentService.createTextOutput(JSON.stringify({"status": "success"}));
+    }
+  } catch(error) {
+    return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}));
+  }
 }
 
 </script>
