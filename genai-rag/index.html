@@ -30,7 +30,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:
 .fsl{font-size:11px;color:#88aacc;min-width:28px;text-align:center}
 .hero{
   background:transparent;
-  text-align:center;padding:54px 20px 24px;position:relative;overflow:hidden;
+  text-align:center;padding:32px 20px 20px;position:relative;overflow:hidden;
 }
 .hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(26,111,196,.12) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
 .hero::after{content:'';position:absolute;top:-200px;left:-200px;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(26,111,196,.15) 0%,transparent 70%);pointer-events:none;animation:pulse 6s ease-in-out infinite}
@@ -47,8 +47,8 @@ body{font-family:'Noto Sans TC',sans-serif;background:
 .sl{font-size:10px;color:#6688aa;font-weight:500}
 .st.active .sl{color:var(--bp);font-weight:700}
 .sline{width:44px;height:2px;background:rgba(26,111,196,.2);margin-top:13px}
-.con{max-width:900px;margin:0 auto;padding:24px 24px 60px}
-.card{background:rgba(255,255,255,.97);border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.18),0 2px 12px rgba(26,111,196,.12);border:1px solid rgba(255,255,255,.8);padding:32px;margin-bottom:16px}
+.con{max-width:900px;margin:0 auto;padding:16px 16px 48px}
+.card{background:rgba(255,255,255,.97);border-radius:var(--r);box-shadow:0 8px 40px rgba(0,0,0,.18),0 2px 12px rgba(26,111,196,.12);border:1px solid rgba(255,255,255,.8);padding:26px;max-width:780px;width:100%;box-sizing:border-box;display:block;margin:0 auto 16px}
 .ct{font-size:12px;color:var(--bp);font-weight:700;letter-spacing:.08em;border-bottom:2px solid var(--bl);padding-bottom:8px;margin-bottom:16px}
 .ct::before{content:"// ";opacity:.5}
 .fg{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -66,7 +66,7 @@ body{font-family:'Noto Sans TC',sans-serif;background:
 .bk{background:var(--ok);color:#fff;box-shadow:0 4px 14px rgba(42,157,92,.28)}
 .bk:hover{background:#22854d}
 .bc{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
-.ub{background:rgba(255,255,255,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);border-radius:var(--rs);padding:8px 16px;font-size:var(--fs);color:var(--bd);display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.ub{background:rgba(255,255,255,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.7);border-radius:var(--rs);padding:8px 16px;font-size:var(--fs);color:var(--bd);display:flex;gap:20px;flex-wrap:wrap;align-items:center;max-width:780px;width:100%;box-sizing:border-box;margin:0 auto 14px}
 .ub strong{color:var(--bp)}
 .ib{background:rgba(221,238,255,.6);border:1px solid rgba(197,218,240,.7);border-radius:var(--rs);padding:10px 16px;font-size:13px;color:var(--bd);display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .dn{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
@@ -1134,6 +1134,7 @@ function showRs(){
            +'</div>';
   }
   document.getElementById("rsBtnArea").innerHTML=btnHtml;
+  submitScoreToSheet();
   show("scRs");
 }
 function tExp(i){const e=document.getElementById("ex"+i),b=e.previousElementSibling.querySelector(".btgl"),s=e.classList.toggle("show");b.textContent=s?"收起解析":"查看解析";}
@@ -1250,6 +1251,7 @@ function showPostRs(){
            +'</div>';
   }
   document.getElementById("rsBtnArea").innerHTML=btnHtml;
+  submitScoreToSheet();
   show("scRs");
 }
 function retakePost(){
@@ -1290,6 +1292,8 @@ function subSv(){
   document.getElementById("svErr").style.display="none";
   const postSc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0);
   const preSc=preAns.reduce((a,v,i)=>a+(v===_qa(PRE_QS[i])?1:0),0);
+  // 送出問卷到 Google Sheets
+  submitSurveyToSheet(preSc, postSc);
   document.getElementById("dInfo").textContent=`${ud.nm} 您好，前測 ${preSc}分 → 後測 ${postSc}分（${Math.round(postSc/QS.length*100)}%）。感謝您的填寫！`;
   show("scDn");
 }
@@ -1341,6 +1345,71 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goSlide(_curSlide + 1);
   if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goSlide(_curSlide - 1);
 });
+
+// ══ Google Sheets API ══
+const _API = "https://script.google.com/macros/s/AKfycbwZnh7M436rw16VC0X1VVSVzWG5R2gTTcKWw7FS3z3OPwUkfFCvngUfVuX2upVcVD9s/exec";
+
+function _post(payload, onOk, onErr) {
+  fetch(_API, {
+    method: "POST",
+    mode: "no-cors",  // GAS Web App 不支援 CORS，用 no-cors
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  }).then(function() {
+    if (onOk) onOk();
+  }).catch(function(err) {
+    console.error("API error:", err);
+    if (onErr) onErr(err);
+  });
+}
+
+function submitScoreToSheet() {
+  // 將答案索引轉成選項字母 A/B/C/D
+  const K = ["A","B","C","D"];
+  const preLetters = preAns.map(function(a) { return a !== null ? K[a] : ""; });
+  const postLetters = postAns.map(function(a) { return a !== null ? K[a] : ""; });
+  const preSc  = preAns.reduce(function(acc,v,i){return acc+(v===_qa(PRE_QS[i])?1:0);},0);
+  const postSc = postAns.reduce(function(acc,v,i){return acc+(v===_qa(QS[i])?1:0);},0);
+
+  _post({
+    action: "SUBMIT_SCORE",
+    clinicName: ud.cl,
+    clinicCode: ud.or,
+    userName:   ud.nm,
+    userTitle:  ud.ti,
+    preAnswers:  preLetters,
+    postAnswers: postLetters,
+    preScore:  preSc,
+    postScore: postSc
+  });
+}
+
+function submitSurveyToSheet(preSc, postSc) {
+  const svLabels = ["非常滿意","滿意","普通","不滿意","非常不滿意"];
+  const q6Checked = Array.from(document.querySelectorAll("input[name=sq6]:checked"))
+                        .map(function(el){return el.value;}).join("、");
+  const q6OtherEl = document.getElementById("sq6OtherText");
+  const q6Other = (document.getElementById("sq6Other") && document.getElementById("sq6Other").querySelector("input[type=checkbox]") && document.getElementById("sq6Other").querySelector("input[type=checkbox]").checked && q6OtherEl) ? q6OtherEl.value : "";
+  const q6Final = q6Checked + (q6Other ? "（其他："+q6Other+"）" : "");
+  const q7 = document.getElementById("sq7") ? document.getElementById("sq7").value : "";
+
+  _post({
+    action: "SUBMIT_SURVEY",
+    clinicName: ud.cl,
+    clinicCode: ud.or,
+    userName:   ud.nm,
+    userTitle:  ud.ti,
+    preScore:   preSc,
+    postScore:  postSc,
+    q1_fit:           svLabels[svRatings[0]],
+    q2_practical:     svLabels[svRatings[1]],
+    q3_schedule:      svLabels[svRatings[2]],
+    q4_comprehension: svLabels[svRatings[3]],
+    q5_confidence:    svLabels[svRatings[4]],
+    q6_interests:     q6Final,
+    q7_feedback:      q7
+  });
+}
 
 </script>
 </body>
