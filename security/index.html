@@ -53,6 +53,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 .logo-badge{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(0,80,200,.1),rgba(0,160,220,.08));border:1px solid var(--accent);border-radius:6px;padding:.4rem 1rem;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--accent);letter-spacing:.1em;margin-bottom:1.5rem;animation:pulseBorder 2s ease-in-out infinite;}
 @keyframes pulseBorder{0%,100%{box-shadow:0 0 10px rgba(0,100,200,.15);}50%{box-shadow:0 0 25px rgba(0,100,200,.35);}}
+@keyframes pulseSurvey{0%,100%{box-shadow:0 0 0 0 rgba(155,89,182,.45);}50%{box-shadow:0 0 0 10px rgba(155,89,182,0);}}
 .main-title{font-size:clamp(1.5rem,4vw,2.6rem);font-weight:900;line-height:1.3;margin-bottom:.4rem;background:linear-gradient(135deg,#003399 0%,#0066cc 50%,#0099cc 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .subtitle{font-size:1rem;color:var(--muted);margin-bottom:2rem;font-weight:300;}
 
@@ -260,7 +261,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="plan-tag">「健康台灣深耕計畫」</div>
     <h1 class="main-title">臺南愛（AI）腸篩<br>大腸癌擴篩完治 × AI轉診<br>智慧平台精進計畫</h1>
   </div>
-  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行圖卡閱讀，完成後自動開始考試</p>
+  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行前測 → 圖卡閱讀 → 後測</p>
 
   <div class="steps-bar">
     <div class="step-item">
@@ -270,12 +271,17 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="step-line" id="step-line1"></div>
     <div class="step-item">
       <div class="step-circle" id="step2-circle">2</div>
-      <div class="step-label" id="step2-label">閱讀圖卡</div>
+      <div class="step-label" id="step2-label">前測</div>
     </div>
     <div class="step-line" id="step-line2"></div>
     <div class="step-item">
       <div class="step-circle" id="step3-circle">3</div>
-      <div class="step-label" id="step3-label">開始考試</div>
+      <div class="step-label" id="step3-label">閱讀圖卡</div>
+    </div>
+    <div class="step-line" id="step-line3"></div>
+    <div class="step-item">
+      <div class="step-circle" id="step4-circle">4</div>
+      <div class="step-label" id="step4-label">後測</div>
     </div>
   </div>
 
@@ -320,7 +326,8 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="quiz-layout">
     <div class="prog-overall"><div class="prog-overall-fill" id="qprog"></div></div>
     <div class="quiz-topbar">
-      <div class="q-counter">題目 <span id="qnum">1</span> / <span id="qtotal">10</span></div>
+      <div class="quiz-mode-badge" id="quiz-mode-badge" style="font-size:.85rem;font-weight:700;color:#0066cc;background:#e6f0ff;border:1px solid #0066cc;border-radius:6px;padding:.2rem .7rem;margin-right:.5rem;">前測</div>
+      <div class="q-counter" id="q-counter-wrap">題目 <span id="qnum">1</span> / <span id="qtotal">10</span></div>
       <div class="q-type-tag" id="qtype">主題</div>
       <div class="ans-count"><span id="anscount">0</span>/<span id="anstotal">10</span> 已作答</div>
     </div>
@@ -360,10 +367,20 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="stat-box"><div class="stat-val fail" id="rwrong">0</div><div class="stat-lbl">答錯</div></div>
       <div class="stat-box"><div class="stat-val" id="rtotal" style="color:var(--accent)">10</div><div class="stat-lbl">總題數</div></div>
     </div>
+    <div id="pre-post-compare" style="display:none;margin-top:.6rem;font-size:.85rem;color:var(--muted);text-align:center;">
+      前測 <span id="pre-score-val" style="font-weight:700;color:var(--accent);">0%</span>
+      　→　
+      後測 <span id="post-score-val" style="font-weight:700;color:var(--accent2);">0%</span>
+      <span id="score-delta" style="margin-left:.4rem;"></span>
+    </div>
     <!-- 問卷提醒（通過者才顯示） -->
+    <div id="survey-prompt" style="display:none;margin:1rem 0;padding:.85rem 1rem;background:linear-gradient(135deg,rgba(108,63,197,.1),rgba(155,89,182,.08));border:1px solid #9b59b6;border-radius:10px;text-align:center;">
+      <div style="font-weight:700;color:#6c3fc5;margin-bottom:.2rem;">🎉 恭喜通過認證！最後一步～</div>
+      <div style="font-size:.9rem;color:var(--muted);">請花 1 分鐘填寫課後問卷，您的意見將幫助我們持續改善課程品質</div>
+    </div>
 
     <div class="result-btns">
-      <button class="btn-primary" id="btn-survey" onclick="playSound('nav');showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);">📝 填寫課後問卷</button>
+      <button class="btn-primary" id="btn-survey" onclick="playSound('nav');showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);animation:pulseSurvey 1.6s ease-in-out infinite;">📝 填寫課後問卷</button>
       <button class="btn-secondary" onclick="playSound('nav');showReview()">📋 查看解析</button>
       <button class="btn-secondary" onclick="playSound('nav');restartAll()">重新考試</button>
     </div>
@@ -442,7 +459,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
       <div class="survey-q" id="sq5">
         <div class="survey-q-num">問題 5 / 5</div>
         <div class="survey-q-text">5. 對本課程有任何建議或意見嗎？（選填）</div>
-        <textarea class="survey-textarea" id="sq5-text" placeholder="請輸入您的建議..."></textarea>
+        <textarea class="survey-textarea" id="sq5-text" placeholder="請輸入您的建議...（選填）"></textarea>
       </div>
 
       <!-- 完成畫面 -->
@@ -493,6 +510,8 @@ const CFG={
 };
 
 let qs=[],cur=0,ans={},vidProg=0,vidTimer=null,vidOK=true,regData={},lastScore=0,lastPassed=false;
+let quizMode='post'; // 'pre' = 前測, 'post' = 後測
+let preTestAns={}, preTestDone=false, preTestScore=0;
 
 (()=>{const c=document.getElementById('particles');for(let i=0;i<28;i++){const p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'%';p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=(Math.random()*10)+'s';p.style.width=p.style.height=(1+Math.random()*2)+'px';c.appendChild(p);}})();
 
@@ -591,24 +610,29 @@ function tryStart(){
   regData={clinic:c,code:co,name:n,title:t};
   saveRecord();
   clearInterval(vidTimer);
-  // 步驟指示器：進入步驟2
+  // 步驟指示器：進入步驟2（前測）
   setStep(2);
-  // 每次考試前都先顯示圖卡
   cardsAllRead = false;
-  // 用 setTimeout 確保 Script 2（含 initCardReader）已載入
-  setTimeout(function(){
-    if(typeof initCardReader === 'function'){
-      for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
-      initCardReader();
-    } else {
-      // 直接顯示 overlay
-      document.getElementById('card-reader-overlay').style.display='flex';
-    }
-  }, 50);
+  preTestDone = false;
+  startPreTest();
+}
+
+function startPreTest(){
+  quizMode='pre';
+  const themeP=THEME_Q.slice(0,CFG.THEME_N);
+  const situP=SITU_Q.slice(0,CFG.SITU_N);
+  qs=[...themeP,...situP];
+  cur=0;ans={};
+  document.getElementById('qtotal').textContent=qs.length;
+  document.getElementById('quiz-mode-badge').textContent='前測';
+  document.getElementById('btnsubmit').textContent='繳交前測';
+  buildDots();
+  showScreen('quiz-screen');
+  renderQ();
 }
 
 function setStep(n){
-  for(let i=1;i<=3;i++){
+  for(let i=1;i<=4;i++){
     const circle = document.getElementById('step'+i+'-circle');
     const label  = document.getElementById('step'+i+'-label');
     const line   = document.getElementById('step-line'+i);
@@ -627,14 +651,30 @@ function setStep(n){
   }
 }
 
-function startQuiz(){
-  // 真正開始考試（由 finishCards 呼叫）
+function startCardReading(){
+  // 步驟指示器：進入步驟3（閱讀圖卡）
   setStep(3);
+  setTimeout(function(){
+    if(typeof initCardReader === 'function'){
+      for(let i=0;i<cardRead.length;i++) cardRead[i]=false;
+      initCardReader();
+    } else {
+      document.getElementById('card-reader-overlay').style.display='flex';
+    }
+  }, 50);
+}
+
+function startQuiz(){
+  // 真正開始考試（由 finishCards 呼叫）= 後測
+  quizMode='post';
+  setStep(4);
   const themeP=THEME_Q.slice(0,CFG.THEME_N);
   const situP=SITU_Q.slice(0,CFG.SITU_N);
   qs=[...themeP,...situP];
   cur=0;ans={};
   document.getElementById('qtotal').textContent=qs.length;
+  document.getElementById('quiz-mode-badge').textContent='後測';
+  document.getElementById('btnsubmit').textContent='繳交答卷';
   buildDots();
   showScreen('quiz-screen');
   renderQ();
@@ -707,11 +747,56 @@ function selectAns(k){
 
 function confirmSubmit(){
   const unanswered=qs.length-Object.keys(ans).length;
+  if(quizMode==='pre'){
+    const msg=unanswered>0
+      ?`還有 ${unanswered} 題未作答，確定要繳交前測嗎？`
+      :'確定繳交前測？繳交後將進入圖卡閱讀。';
+    if(!confirm(msg))return;
+    finishPreTest();
+    return;
+  }
   const msg=unanswered>0
     ?`還有 ${unanswered} 題未作答，確定要繳交嗎？`
     :'確定繳交答卷？繳交後無法更改答案。';
   if(!confirm(msg))return;
   calcResult();
+}
+
+function finishPreTest(){
+  // 儲存前測作答紀錄，不計分顯示，直接進入圖卡閱讀
+  preTestAns = {...ans};
+  preTestDone = true;
+  let correct=0;
+  qs.forEach((q,i)=>{if(preTestAns[i]===q.answer)correct++;});
+  preTestScore = Math.round(correct/qs.length*100);
+  playSound('submit');
+  syncPreTestToGSheet();
+  startCardReading();
+}
+
+function syncPreTestToGSheet(){
+  if(!CFG.GSHEET_URL||CFG.GSHEET_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL'){
+    return;
+  }
+  let correct=0;
+  qs.forEach((q,i)=>{if(preTestAns[i]===q.answer)correct++;});
+  const payload={
+    type:    'pretest',
+    token:   atob('dGFpbmFuLWFpLXF1aXotMjAyNQ=='),
+    name:    regData.name,
+    clinic:  regData.clinic,
+    code:    regData.code,
+    title:   regData.title,
+    correct: correct,
+    total:   qs.length,
+    userAns: preTestAns
+  };
+  fetch(CFG.GSHEET_URL,{
+    method:'POST',
+    mode:'no-cors',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  }).then(r=>{}).catch(e=>{});
 }
 
 function calcResult(){
@@ -730,11 +815,26 @@ function calcResult(){
   ring.style.stroke=pass?'var(--accent2)':'var(--danger)';
   setTimeout(()=>{ring.style.strokeDashoffset=263.9*(1-pct/100);},200);
 
+  // 前測/後測對照
+  if(preTestDone){
+    document.getElementById('pre-post-compare').style.display='block';
+    document.getElementById('pre-score-val').textContent=preTestScore+'%';
+    document.getElementById('post-score-val').textContent=pct+'%';
+    const diff=pct-preTestScore;
+    const deltaEl=document.getElementById('score-delta');
+    if(diff>0){deltaEl.textContent='▲ +'+diff+'%';deltaEl.style.color='var(--accent2)';}
+    else if(diff<0){deltaEl.textContent='▼ '+diff+'%';deltaEl.style.color='var(--danger)';}
+    else{deltaEl.textContent='（持平）';deltaEl.style.color='var(--muted)';}
+  } else {
+    document.getElementById('pre-post-compare').style.display='none';
+  }
+
   if(pass){
     document.getElementById('rtitle').textContent='🎉 恭喜通過認證！';
     document.getElementById('rmsg').textContent='您已通過醫療院所資安認證考試，得分 '+pct+' 分（及格線 '+CFG.PASS+' 分）。';
     // 通過後：先填問卷，問卷完成才顯示證書
     document.getElementById('btn-survey').style.display='inline-block';
+    document.getElementById('survey-prompt').style.display='block';
     lastScore=pct; lastPassed=true;
     syncToGSheet(pct,correct,wrong,true);
     playSound("pass");
@@ -866,16 +966,19 @@ function restartAll(){
   // 重置考試狀態
   qs = []; ans = {}; cur = 0;
   cardsAllRead = false;
+  preTestAns = {}; preTestDone = false; preTestScore = 0; quizMode='pre';
   // 重置問卷狀態
   Object.keys(surveyAns).forEach(k => delete surveyAns[k]);
   const survDone    = document.getElementById('survey-done');
   const survActions = document.getElementById('survey-actions');
   const survProg    = document.getElementById('survey-prog');
   const btnSurvey   = document.getElementById('btn-survey');
+  const surveyPrompt = document.getElementById('survey-prompt');
   if(survDone)    survDone.style.display    = 'none';
   if(survActions) survActions.style.display = 'flex';
   if(survProg)    survProg.style.width      = '0%';
-  if(btnSurvey)   btnSurvey.style.display   = 'inline-block';
+  if(btnSurvey)   btnSurvey.style.display   = 'none';
+  if(surveyPrompt) surveyPrompt.style.display = 'none';
   // 重置問卷選項（取消所有選取）
   document.querySelectorAll('.sq-opt.selected').forEach(el => el.classList.remove('selected'));
   const sq5 = document.getElementById('sq5-text');
@@ -931,6 +1034,8 @@ function submitSurvey(){
     }
     const btnSurvey = document.getElementById('btn-survey');
     if(btnSurvey) btnSurvey.style.display='none';
+    const surveyPrompt = document.getElementById('survey-prompt');
+    if(surveyPrompt) surveyPrompt.style.display='none';
   }, 3000);
 }
 
