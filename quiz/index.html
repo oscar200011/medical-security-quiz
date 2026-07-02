@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>愛腸篩計畫培訓測驗中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: linear-gradient(180deg, #f5f0ff 0%, #fff5f8 50%, #f0f8ff 100%);
+            min-height: 100vh;
+            padding: 60px 20px;
+        }
+
+        /* 背景裝飾 */
+        .bg-decoration {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.15;
+        }
+
+        .deco-1 {
+            top: 8%;
+            left: 3%;
+            font-size: 90px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .deco-2 {
+            top: 15%;
+            right: 5%;
+            font-size: 100px;
+            animation: float 7s ease-in-out infinite 1s;
+        }
+
+        .deco-3 {
+            bottom: 20%;
+            left: 6%;
+            font-size: 85px;
+            animation: float 8s ease-in-out infinite 2s;
+        }
+
+        .deco-4 {
+            bottom: 15%;
+            right: 4%;
+            font-size: 80px;
+            animation: float 5s ease-in-out infinite 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 標題 */
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #3f51b5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .header .subtitle {
+            font-size: 1.3rem;
+            color: #7b1fa2;
+        }
+
+        /* 卡片容器 */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 60px;
+        }
+
+        /* 卡片 */
+        .card-wrapper {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            display: block;
+        }
+
+        .card-wrapper:hover {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 3px solid;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* 卡片邊框顏色 */
+        .card-wrapper:nth-child(1) .card {
+            border-color: #ffb3d9;
+        }
+
+        .card-wrapper:nth-child(2) .card {
+            border-color: #64b5f6;
+        }
+
+        .card-wrapper:nth-child(3) .card {
+            border-color: #ce93d8;
+        }
+
+        /* 圖片區域 */
+        .card-image-area {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-wrapper:nth-child(1) .card-image-area {
+            background: linear-gradient(135deg, #ffe0ec 0%, #ffcce6 100%);
+        }
+
+        .card-wrapper:nth-child(2) .card-image-area {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .card-wrapper:nth-child(3) .card-image-area {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .card-image-area img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+
+        /* 徽章 */
+        .card-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 2px solid;
+        }
+
+        .card-wrapper:nth-child(1) .card-badge {
+            color: #e91e63;
+            border-color: #ffb3d9;
+        }
+
+        .card-wrapper:nth-child(2) .card-badge {
+            color: #1976d2;
+            border-color: #64b5f6;
+        }
+
+        .card-wrapper:nth-child(3) .card-badge {
+            color: #7c3aed;
+            border-color: #ce93d8;
+        }
+
+        /* 內容區域 */
+        .card-content {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            line-height: 1.4;
+            min-height: 88px;
+        }
+
+        .card-wrapper:nth-child(1) .card-title {
+            color: #e91e63;
+        }
+
+        .card-wrapper:nth-child(2) .card-title {
+            color: #1976d2;
+        }
+
+        .card-wrapper:nth-child(3) .card-title {
+            color: #7c3aed;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        /* 功能列表 - 固定高度確保對齐 */
+        .features-list {
+            margin-bottom: 30px;
+            flex: 1;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 14px;
+            font-size: 0.93rem;
+            color: #555;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .feature-checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .card-wrapper:nth-child(1) .feature-checkmark {
+            background: linear-gradient(135deg, #f48fb1 0%, #f06292 100%);
+        }
+
+        .card-wrapper:nth-child(2) .feature-checkmark {
+            background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+        }
+
+        .card-wrapper:nth-child(3) .feature-checkmark {
+            background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
+        }
+
+        /* 底部 */
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 25px;
+            border-top: 2px solid rgba(0, 0, 0, 0.05);
+            margin-top: auto;
+        }
+
+        .card-category {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .card-wrapper:nth-child(1) .card-category {
+            color: #e91e63;
+        }
+
+        .card-wrapper:nth-child(2) .card-category {
+            color: #1976d2;
+        }
+
+        .card-wrapper:nth-child(3) .card-category {
+            color: #7c3aed;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            padding: 14px 38px;
+            border-radius: 28px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.35);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .card-wrapper:hover .start-button {
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.5);
+        }
+
+        .start-button::after {
+            content: '→';
+            font-size: 1.1rem;
+        }
+
+        /* 響應式 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .card-image-area {
+                height: 250px;
+            }
+
+            .card-content {
+                padding: 30px;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .features-list {
+                min-height: auto;
+            }
+
+            .bg-decoration {
+                font-size: 40px !important;
+                opacity: 0.1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景裝飾 -->
+    <div class="bg-decoration deco-1">🩺</div>
+    <div class="bg-decoration deco-2">💊</div>
+    <div class="bg-decoration deco-3">❤️</div>
+    <div class="bg-decoration deco-4">🏥</div>
+
+    <div class="container">
+        <!-- 標題 -->
+        <div class="header">
+            <h1>🏥 醫療健康題庫中心</h1>
+            <div class="subtitle">📚 提升專業知識・守護健康未來</div>
+        </div>
+        
+        <!-- 卡片容器 -->
+        <div class="cards-container">
+            <!-- 大腸癌篩檢卡片 -->
+            <a href="https://cmtpo-teacher-test.vercel.app/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/colon-quiz-cover.png" alt="大腸癌篩檢">
+                        <div class="card-badge">🎯 篩檢專區</div>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">🩺 大腸癌篩檢題庫</h2>
+                        <p class="card-description">學習大腸癌篩檢相關知識，提升早期發現與預防能力，守護民眾健康！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>涵蓋篩檢流程與注意事項</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>大腸癌篩檢相關知識</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="card-category">📊 健康篩檢</div>
+                            <span class="start-button">開始學習</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 醫療資安認證卡片 -->
+            <a href="https://oscar200011.github.io/medical-security-quiz/security/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/security-quiz-cover.jpg" alt="醫療資安認證">
+                        <div class="card-badge">🔐 資安專區</div>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">🔒 醫療資安認證題庫</h2>
+                        <p class="card-description">掌握醫療資訊安全核心知識，保護病患隱私，確保醫療系統安全！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實務案例深入解析</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>診所資安規範與相關法規</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實施前後測確認學習品質</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="card-category">🔐 資訊安全</div>
+                            <span class="start-button">開始學習</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <!-- GenAI × RAG 卡片 -->
+            <a href="https://oscar200011.github.io/medical-security-quiz/genai-rag/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/ai-quiz-cover.png" alt="GenAI × RAG">
+                        <div class="card-badge">🤖 AI專區</div>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">🤖 GenAI × RAG 基礎概念認證題庫</h2>
+                        <p class="card-description">掌握生成式 AI 與檢索增強生成技術的核心概念，成為 AI 智慧醫療的推動者！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>GenAI 與 RAG 基礎原理</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>AI 智慧醫療應用案例</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實施前後測確認學習品質</span>
+                            </div>
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="card-category">🧠 智能學習</div>
+                            <span class="start-button">開始學習</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>
