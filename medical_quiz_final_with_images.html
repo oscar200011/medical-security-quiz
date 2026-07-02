@@ -13,88 +13,45 @@
 
         body {
             font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
-            background: linear-gradient(135deg, 
-                #fef9f3 0%, 
-                #fff5f8 25%, 
-                #f0f8ff 50%, 
-                #f9f5ff 75%, 
-                #fef9f3 100%);
+            background: linear-gradient(180deg, #f5f0ff 0%, #fff5f8 50%, #f0f8ff 100%);
             min-height: 100vh;
-            padding: 40px 20px;
-            position: relative;
-            overflow-x: hidden;
+            padding: 60px 20px;
         }
 
-        /* 可愛的背景裝飾 - 更多樣化的顏色 */
+        /* 背景裝飾 */
         .bg-decoration {
             position: fixed;
             pointer-events: none;
             z-index: 0;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.05));
+            opacity: 0.15;
         }
 
         .deco-1 {
             top: 8%;
             left: 3%;
             font-size: 90px;
-            opacity: 0.2;
             animation: float 6s ease-in-out infinite;
         }
 
         .deco-2 {
             top: 15%;
             right: 5%;
-            font-size: 110px;
-            opacity: 0.18;
+            font-size: 100px;
             animation: float 7s ease-in-out infinite 1s;
         }
 
         .deco-3 {
             bottom: 20%;
-            left: 8%;
-            font-size: 95px;
-            opacity: 0.2;
+            left: 6%;
+            font-size: 85px;
             animation: float 8s ease-in-out infinite 2s;
         }
 
         .deco-4 {
-            bottom: 30%;
+            bottom: 15%;
             right: 4%;
-            font-size: 85px;
-            opacity: 0.18;
+            font-size: 80px;
             animation: float 5s ease-in-out infinite 1.5s;
-        }
-
-        .deco-5 {
-            top: 45%;
-            left: 2%;
-            font-size: 70px;
-            opacity: 0.15;
-            animation: pulse 3s ease-in-out infinite;
-        }
-
-        .deco-6 {
-            top: 55%;
-            right: 3%;
-            font-size: 75px;
-            opacity: 0.15;
-            animation: pulse 3.5s ease-in-out infinite 0.5s;
-        }
-
-        .deco-7 {
-            top: 30%;
-            left: 50%;
-            font-size: 60px;
-            opacity: 0.12;
-            animation: rotate 10s linear infinite;
-        }
-
-        .deco-8 {
-            bottom: 10%;
-            left: 50%;
-            font-size: 65px;
-            opacity: 0.12;
-            animation: rotate 12s linear infinite reverse;
         }
 
         @keyframes float {
@@ -102,256 +59,318 @@
             50% { transform: translateY(-20px) rotate(5deg); }
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
         }
 
-        /* 標題區域 */
+        /* 標題 */
         .header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 80px;
         }
 
         .header h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             background: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #3f51b5 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 15px;
-            text-shadow: none;
+            margin-bottom: 20px;
             font-weight: 900;
         }
 
         .header .subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #7b1fa2;
-            background: rgba(255, 255, 255, 0.85);
-            display: inline-block;
-            padding: 12px 30px;
-            border-radius: 30px;
-            box-shadow: 0 4px 20px rgba(156, 39, 176, 0.15);
-            border: 2px solid rgba(156, 39, 176, 0.1);
         }
 
-        /* 卡片網格 */
-        .cards-grid {
+        /* 卡片容器 */
+        .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
-            padding: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 60px;
+        }
+
+        /* 卡片 */
+        .card-wrapper {
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            display: block;
+        }
+
+        .card-wrapper:hover {
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
         }
 
         .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 24px;
+            background: white;
+            border-radius: 30px;
             overflow: hidden;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-            border: 3px solid transparent;
-            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            border: 3px solid;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
-        .card:hover {
-            transform: translateY(-15px) scale(1.02);
-            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.15);
+        /* 卡片邊框顏色 */
+        .card-wrapper:nth-child(1) .card {
+            border-color: #ffb3d9;
+        }
+
+        .card-wrapper:nth-child(2) .card {
+            border-color: #64b5f6;
+        }
+
+        .card-wrapper:nth-child(3) .card {
             border-color: #ce93d8;
         }
 
-        .card-image-wrapper {
+        /* 圖片區域 */
+        .card-image-area {
             width: 100%;
-            height: 240px;
-            position: relative;
-            overflow: hidden;
+            height: 300px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            position: relative;
+            overflow: hidden;
         }
 
-        .card:nth-child(2) .card-image-wrapper {
-            background: linear-gradient(135deg, #e1f5fe 0%, #f3e5f5 100%);
+        .card-wrapper:nth-child(1) .card-image-area {
+            background: linear-gradient(135deg, #ffe0ec 0%, #ffcce6 100%);
         }
 
-        .card-image-wrapper img {
-            max-width: 85%;
-            max-height: 85%;
+        .card-wrapper:nth-child(2) .card-image-area {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .card-wrapper:nth-child(3) .card-image-area {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+        }
+
+        .card-image-area img {
+            max-width: 80%;
+            max-height: 80%;
             object-fit: contain;
         }
 
-        .card:nth-child(3) .card-image-wrapper {
-            background: #f0eeff;
-        }
-
-        .card:nth-child(3) .card-image-wrapper img {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-        }
-
+        /* 徽章 */
         .card-badge {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 8px 18px;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 10px 25px;
             border-radius: 25px;
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 2px solid;
+        }
+
+        .card-wrapper:nth-child(1) .card-badge {
             color: #e91e63;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 2px solid rgba(233, 30, 99, 0.15);
+            border-color: #ffb3d9;
         }
 
-        .card:nth-child(2) .card-badge {
+        .card-wrapper:nth-child(2) .card-badge {
             color: #1976d2;
-            border-color: rgba(25, 118, 210, 0.15);
+            border-color: #64b5f6;
         }
 
+        .card-wrapper:nth-child(3) .card-badge {
+            color: #7c3aed;
+            border-color: #ce93d8;
+        }
+
+        /* 內容區域 */
         .card-content {
-            padding: 28px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .card-title {
             font-size: 1.8rem;
             font-weight: bold;
-            color: #e91e63;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            line-height: 1.4;
+            min-height: 88px;
         }
 
-        .card:nth-child(2) .card-title {
+        .card-wrapper:nth-child(1) .card-title {
+            color: #e91e63;
+        }
+
+        .card-wrapper:nth-child(2) .card-title {
             color: #1976d2;
         }
 
-        .card-description {
-            font-size: 1rem;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 20px;
+        .card-wrapper:nth-child(3) .card-title {
+            color: #7c3aed;
         }
 
-        .card-features {
-            margin-bottom: 20px;
+        .card-description {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.7;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+
+        /* 功能列表 - 固定高度確保對齐 */
+        .features-list {
+            margin-bottom: 30px;
+            flex: 1;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .feature-item {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            font-size: 0.95rem;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 14px;
+            font-size: 0.93rem;
             color: #555;
+            line-height: 1.6;
+            text-align: left;
         }
 
-        .feature-icon {
-            width: 22px;
-            height: 22px;
-            background: linear-gradient(135deg, #f48fb1 0%, #f06292 100%);
+        .feature-checkmark {
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 0.7rem;
+            font-size: 0.8rem;
             font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
-        .card:nth-child(2) .feature-icon {
+        .card-wrapper:nth-child(1) .feature-checkmark {
+            background: linear-gradient(135deg, #f48fb1 0%, #f06292 100%);
+        }
+
+        .card-wrapper:nth-child(2) .feature-checkmark {
             background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
         }
 
+        .card-wrapper:nth-child(3) .feature-checkmark {
+            background: linear-gradient(135deg, #ce93d8 0%, #ba68c8 100%);
+        }
+
+        /* 底部 */
         .card-footer {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-top: 20px;
-            border-top: 2px solid rgba(233, 30, 99, 0.1);
+            padding-top: 25px;
+            border-top: 2px solid rgba(0, 0, 0, 0.05);
+            margin-top: auto;
         }
 
-        .card:nth-child(2) .card-footer {
-            border-color: rgba(25, 118, 210, 0.1);
-        }
-
-        .start-button {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
-            padding: 12px 28px;
-            border-radius: 25px;
-            font-weight: bold;
+        .card-category {
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+            font-weight: 500;
+            text-align: left;
         }
 
-        .card:hover .start-button {
+        .card-wrapper:nth-child(1) .card-category {
+            color: #e91e63;
+        }
+
+        .card-wrapper:nth-child(2) .card-category {
+            color: #1976d2;
+        }
+
+        .card-wrapper:nth-child(3) .card-category {
+            color: #7c3aed;
+        }
+
+        .start-button {
+            background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+            color: white;
+            padding: 14px 38px;
+            border-radius: 28px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(26, 188, 156, 0.35);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .card-wrapper:hover .start-button {
             transform: translateX(5px);
-            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.4);
+            box-shadow: 0 6px 20px rgba(26, 188, 156, 0.5);
         }
 
         .start-button::after {
             content: '→';
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
-        /* 響應式設計 */
+        /* 響應式 */
         @media (max-width: 768px) {
             .header h1 {
-                font-size: 2rem;
+                font-size: 2.2rem;
             }
 
-            .header .subtitle {
-                font-size: 1rem;
-                padding: 10px 20px;
-            }
-
-            .cards-grid {
+            .cards-container {
                 grid-template-columns: 1fr;
-                gap: 30px;
-                padding: 10px;
+                gap: 40px;
             }
 
-            .card-image-wrapper {
-                height: 200px;
+            .card-image-area {
+                height: 250px;
+            }
+
+            .card-content {
+                padding: 30px;
+            }
+
+            .card-title {
+                font-size: 1.5rem;
+            }
+
+            .features-list {
+                min-height: auto;
             }
 
             .bg-decoration {
-                font-size: 50px !important;
+                font-size: 40px !important;
+                opacity: 0.1;
             }
         }
     </style>
 </head>
 <body>
-    <!-- 背景可愛裝飾 - 多樣化 -->
+    <!-- 背景裝飾 -->
     <div class="bg-decoration deco-1">🩺</div>
     <div class="bg-decoration deco-2">💊</div>
-    <div class="bg-decoration deco-3">🏥</div>
-    <div class="bg-decoration deco-4">🔬</div>
-    <div class="bg-decoration deco-5">❤️</div>
-    <div class="bg-decoration deco-6">🛡️</div>
-    <div class="bg-decoration deco-7">⭐</div>
-    <div class="bg-decoration deco-8">💫</div>
+    <div class="bg-decoration deco-3">❤️</div>
+    <div class="bg-decoration deco-4">🏥</div>
 
     <div class="container">
         <!-- 標題 -->
@@ -360,124 +379,130 @@
             <div class="subtitle">📚 提升專業知識・守護健康未來</div>
         </div>
         
-        <!-- 題庫卡片 -->
-        <div class="cards-grid">
-            <!-- 大腸癌篩檢題庫 -->
-            <a href="https://cmtpo-teacher-test.vercel.app/" class="card" target="_blank">
-                <div class="card-image-wrapper">
-                    <!-- 此處嵌入第一張圖片的 base64，因為太長就不完整展示，實際檔案中有完整的 base64 編碼 -->
-                    <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/colon-quiz-cover.png" alt="大腸癌篩檢">
-                    <div class="card-badge">🎯 篩檢專區</div>
-                </div>
-                <div class="card-content">
-                    <div class="card-title">
-                        🩺 大腸癌篩檢題庫
+        <!-- 卡片容器 -->
+        <div class="cards-container">
+            <!-- 大腸癌篩檢卡片 -->
+            <a href="https://cmtpo-teacher-test.vercel.app/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/colon-quiz-cover.png" alt="大腸癌篩檢">
+                        <div class="card-badge">🎯 篩檢專區</div>
                     </div>
-                    <div class="card-description">
-                        學習大腸癌篩檢相關知識，提升早期發現與預防能力，守護民眾健康！
-                    </div>
-                    <div class="card-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>涵蓋篩檢流程與注意事項</span>
+                    <div class="card-content">
+                        <h2 class="card-title">🩺 大腸癌篩檢題庫</h2>
+                        <p class="card-description">學習大腸癌篩檢相關知識，提升早期發現與預防能力，守護民眾健康！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>涵蓋篩檢流程與注意事項</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>大腸癌篩檢相關知識</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>專業醫療知識完整收錄</span>
+
+                        <div class="card-footer">
+                            <div class="card-category">📊 健康篩檢</div>
+                            <span class="start-button">開始學習</span>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>互動式學習體驗</span>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div style="color: #999; font-size: 0.9rem;">📊 健康篩檢</div>
-                        <div class="start-button">開始學習</div>
                     </div>
                 </div>
             </a>
 
-            <!-- 醫療資安認證題庫 -->
-            <a href="https://oscar200011.github.io/medical-security-quiz/" class="card" target="_blank">
-                <div class="card-image-wrapper">
-                    <!-- 此處嵌入第二張圖片的 base64 -->
-                    <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/security-quiz-cover.jpg" alt="醫療資安">
-                    <div class="card-badge">🔐 資安專區</div>
-                </div>
-                <div class="card-content">
-                    <div class="card-title">
-                        🔒 醫療資安認證題庫
+            <!-- 醫療資安認證卡片 -->
+            <a href="https://oscar200011.github.io/medical-security-quiz/security/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/security-quiz-cover.jpg" alt="醫療資安認證">
+                        <div class="card-badge">🔐 資安專區</div>
                     </div>
-                    <div class="card-description">
-                        掌握醫療資訊安全核心知識，保護病患隱私，確保醫療系統安全！
-                    </div>
-                    <div class="card-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>完整資安法規與規範</span>
+                    <div class="card-content">
+                        <h2 class="card-title">🔒 醫療資安認證題庫</h2>
+                        <p class="card-description">掌握醫療資訊安全核心知識，保護病患隱私，確保醫療系統安全！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實務案例深入解析</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>診所資安規範與相關法規</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實施前後測確認學習品質</span>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>實務案例深入解析</span>
+
+                        <div class="card-footer">
+                            <div class="card-category">🔐 資訊安全</div>
+                            <span class="start-button">開始學習</span>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>認證考試題型練習</span>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div style="color: #999; font-size: 0.9rem;">🔐 資訊安全</div>
-                        <div class="start-button">開始學習</div>
                     </div>
                 </div>
             </a>
 
-            <!-- GenAI × RAG 基礎概念認證題庫 -->
-            <a href="https://oscar200011.github.io/medical-security-quiz/genai-rag/" class="card" target="_blank">
-                <div class="card-image-wrapper">
-                    <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/ai-quiz-cover.png" alt="GenAI RAG 題庫" onerror="this.style.background='linear-gradient(135deg, #667eea 0%, #764ba2 100%)';this.style.height='200px';this.alt=''">
-                    <div class="card-badge">🤖 AI 專區</div>
-                </div>
-                <div class="card-content">
-                    <div class="card-title">
-                        🤖 GenAI × RAG 基礎概念認證題庫
+            <!-- GenAI × RAG 卡片 -->
+            <a href="https://oscar200011.github.io/medical-security-quiz/genai-rag/" class="card-wrapper" target="_blank" rel="noopener noreferrer">
+                <div class="card">
+                    <div class="card-image-area">
+                        <img src="https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/ai-quiz-cover.png" alt="GenAI × RAG">
+                        <div class="card-badge">🤖 AI專區</div>
                     </div>
-                    <div class="card-description">
-                        掌握生成式 AI 與檢索增強生成技術的核心概念，通過認證測驗，成為 AI 智慧醫療的推動者！
-                    </div>
-                    <div class="card-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>GenAI 與 RAG 基礎原理</span>
+                    <div class="card-content">
+                        <h2 class="card-title">🤖 GenAI × RAG 基礎概念認證題庫</h2>
+                        <p class="card-description">掌握生成式 AI 與檢索增強生成技術的核心概念，成為 AI 智慧醫療的推動者！</p>
+                        
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>GenAI 與 RAG 基礎原理</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>閱讀教材後方可應試</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>AI 智慧醫療應用案例</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>種子教師必修課程</span>
+                            </div>
+                            <div class="feature-item">
+                                <div class="feature-checkmark">✓</div>
+                                <span>實施前後測確認學習品質</span>
+                            </div>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>閱讀講義後方可應試</span>
+
+                        <div class="card-footer">
+                            <div class="card-category">🧠 智能學習</div>
+                            <span class="start-button">開始學習</span>
                         </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">✓</div>
-                            <span>通過即取得認證資格</span>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div style="color: #999; font-size: 0.9rem;">🤖 人工智慧</div>
-                        <div class="start-button">開始學習</div>
                     </div>
                 </div>
             </a>
         </div>
     </div>
-
-    <script>
-        // 添加點擊音效或其他互動效果
-        document.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.animation = 'none';
-                setTimeout(() => {
-                    this.style.animation = '';
-                }, 10);
-            });
-        });
-    </script>
 </body>
 </html>
