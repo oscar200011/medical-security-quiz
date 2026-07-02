@@ -1069,9 +1069,11 @@ let cq=0,ans=new Array(10).fill(null),tmI,t0;
 function startQ(){
   initPostQ();
 }
-function startTm(){
+var _tmExpiryCb=null;
+function startTm(expiryCb){
+  _tmExpiryCb=expiryCb||showRs;
   clearInterval(tmI);let r=1200;document.getElementById("tmb").style.display="";
-  tmI=setInterval(()=>{r--;const tv=String(Math.floor(r/60)).padStart(2,"0")+":"+String(r%60).padStart(2,"0");document.getElementById("tmv").textContent=tv;const s2=document.getElementById("tmb2");if(s2)s2.textContent=tv;if(r<=0){clearInterval(tmI);burnToken();_examStarted=false;showRs();}},1000);
+  tmI=setInterval(()=>{r--;const tv=String(Math.floor(r/60)).padStart(2,"0")+":"+String(r%60).padStart(2,"0");document.getElementById("tmv").textContent=tv;const s2=document.getElementById("tmb2");if(s2)s2.textContent=tv;if(r<=0){clearInterval(tmI);burnToken();_examStarted=false;_tmExpiryCb();}},1000);
 }
 function renderNav(){
   const mk=(id)=>{const n=document.getElementById(id);if(!n)return;n.innerHTML=QS.map((_,i)=>`<button class='qnb${i===cq?"' style='background:var(--bp);border-color:var(--bp);color:#fff'":ans[i]!==null?"' style='background:var(--bl);border-color:var(--bp);color:var(--bp)'":"'"} onclick='goQ(${i})'>${i+1}</button>`).join('');};
@@ -1109,7 +1111,7 @@ function cfmSub(){
 function showRs(){
   clearInterval(tmI);document.getElementById("tmb").style.display="none";
   _examStarted=false;sfxDone();
-  const el=Math.round((Date.now()-t0)/1000),sc=ans.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=8;
+  const el=Math.round((Date.now()-t0)/1000),sc=ans.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=7;
   document.getElementById("ub3").innerHTML=ubH();
   document.getElementById("rh").innerHTML=`<div class="rc2 ${pass?"rcp":"rcf"}"><div class="rsn2">${sc}</div><div class="rd">/ ${QS.length}</div></div><div class="rti">${pass?"🎉 恭喜通過測驗！":"📚 建議複習講義後再試"}</div><div class="rsu">${ud.nm}・${ud.ti}・${ud.cl}</div>`;
   document.getElementById("rg").innerHTML=`<div class="rst"><div class="rsn">${sc}</div><div class="rsl">答對題數</div></div><div class="rst"><div class="rsn">${Math.round(sc/QS.length*100)}%</div><div class="rsl">得分率</div></div><div class="rst"><div class="rsn">${Math.floor(el/60)}′${String(el%60).padStart(2,"0")}″</div><div class="rsl">作答時間</div></div>`;
@@ -1120,16 +1122,16 @@ function showRs(){
   // 依通過/未通過決定按鈕
   var btnHtml;
   if(pass){
-    btnHtml='<button class="btn bo" onclick="retake()">重新作答</button>'
+    btnHtml='<button class="btn bo" onclick="retakePost()">重新後測</button>'
            +'<button class="btn bp" onclick="goSv()">填寫課後問卷 →</button>';
   } else {
     btnHtml='<div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%">'
            +'<div style="background:#fff8e1;border:1px solid #f5a623;border-radius:var(--rs);padding:12px 20px;font-size:calc(var(--fs) - 1px);color:#7a5c00;text-align:center;max-width:440px">'
-           +'📚 本次測驗未達及格標準（80分），請複習講義後重新作答。'
+           +'📚 本次測驗未達及格標準（70分），請複習講義後重新作答。'
            +'</div>'
            +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
            +'<button class="btn bo" onclick="goReview()">← 回去複習講義</button>'
-           +'<button class="btn bp" onclick="retake()">重新作答</button>'
+           +'<button class="btn bp" onclick="retakePost()">重新後測</button>'
            +'</div>'
            +'</div>';
   }
@@ -1138,7 +1140,14 @@ function showRs(){
   show("scRs");
 }
 function tExp(i){const e=document.getElementById("ex"+i),b=e.previousElementSibling.querySelector(".btgl"),s=e.classList.toggle("show");b.textContent=s?"收起解析":"查看解析";}
-function retake(){if(!checkRateLimit())return;genToken();recordAttempt();_examStarted=true;clearInterval(tmI);document.getElementById("tmb").style.display="none";ans=new Array(10).fill(null);cq=0;t0=Date.now();startTm();show("scQz");renderQ();sfxNext();}
+function goReview(){
+  genToken();
+  sStep(3);
+  document.getElementById("ub1").innerHTML=ubH();
+  show("scRd");
+}
+
+function retake(){retakePost();}
 
 // ── 前測 ──
 var preAns=new Array(10).fill(null), preCq=0, _preAdvancing=false;
@@ -1149,9 +1158,9 @@ function renderPreQ(){
   document.getElementById("preQans").textContent="已答："+preAns.filter(a=>a!==null).length+" 題";
   document.getElementById("preQpf").style.width=(preCq/PRE_QS.length*100)+"%";
   document.getElementById("preQa").innerHTML=`<div class="qt"><span class="qn">Q${preCq+1}</span>${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt${i===ua?" sel":""}" onclick="selPreOpt(${i})"><div class="ok2">${["A","B","C","D"][i]}</div><div class="ot">${o}</div></div>`).join("")}</div>`;
-  document.getElementById("preBPrev").style.display=preCq>0?"":"none";
-  document.getElementById("preBNext").style.display=preCq<PRE_QS.length-1?"":"none";
-  document.getElementById("preBSub").style.display=preCq===PRE_QS.length-1?"":"none";
+  document.getElementById("preBPrev").style.display=preCq>0?"inline-flex":"none";
+  document.getElementById("preBNext").style.display=preCq<PRE_QS.length-1?"inline-flex":"none";
+  document.getElementById("preBSub").style.display=preCq===PRE_QS.length-1?"inline-flex":"none";
 }
 function selPreOpt(i){
   if(_preAdvancing)return;
@@ -1176,7 +1185,7 @@ function initPostQ(){
   recordAttempt();_examStarted=true;
   postCq=0;postAns=new Array(10).fill(null);postT0=Date.now();
   document.getElementById("ubPost").innerHTML=ubH()+'<span style="margin-left:auto;font-size:12px;color:#888">今日剩餘次數：'+getRemaining()+'</span>';
-  startTm();sStep(4);show("scPost");renderPostQ();sfxNext();
+  startTm(showPostRs);sStep(4);show("scPost");renderPostQ();sfxNext();
 }
 function renderPostQ(){
   const q=QS[postCq],ua=postAns[postCq];
@@ -1185,9 +1194,9 @@ function renderPostQ(){
   document.getElementById("postQpf").style.width=(postCq/QS.length*100)+"%";
   // reuse qnav for post
   document.getElementById("postQa").innerHTML=`<div class="qt"><span class="qn">Q${postCq+1}</span>${q.q}</div><div class="opts">${q.o.map((o,i)=>`<div class="opt${i===ua?" sel":""}" onclick="selPostOpt(${i})"><div class="ok2">${["A","B","C","D"][i]}</div><div class="ot">${o}</div></div>`).join("")}</div>`;
-  document.getElementById("postBPrev").style.display=postCq>0?"":"none";
-  document.getElementById("postBNext").style.display=postCq<QS.length-1?"":"none";
-  document.getElementById("postBSub").style.display=postCq===QS.length-1?"":"none";
+  document.getElementById("postBPrev").style.display=postCq>0?"inline-flex":"none";
+  document.getElementById("postBNext").style.display=postCq<QS.length-1?"inline-flex":"none";
+  document.getElementById("postBSub").style.display=postCq===QS.length-1?"inline-flex":"none";
 }
 function selPostOpt(i){
   if(_postAdvancing)return;
@@ -1206,7 +1215,7 @@ function cfmPost(){
 function showPostRs(){
   clearInterval(tmI);document.getElementById("tmb").style.display="none";
   _examStarted=false;sfxDone();
-  const el=Math.round((Date.now()-postT0)/1000),sc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=8;
+  const el=Math.round((Date.now()-postT0)/1000),sc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=7;
   // 計算前測分數
   const preSc=preAns.reduce((a,v,i)=>a+(v===_qa(PRE_QS[i])?1:0),0);
   document.getElementById("ub3").innerHTML=ubH();
@@ -1242,7 +1251,7 @@ function showPostRs(){
   } else {
     btnHtml='<div style="display:flex;flex-direction:column;align-items:center;gap:12px;width:100%">'
            +'<div style="background:#fff8e1;border:1px solid #f5a623;border-radius:var(--rs);padding:12px 20px;font-size:calc(var(--fs) - 1px);color:#7a5c00;text-align:center;max-width:440px">'
-           +'📚 本次後測未達及格標準（80分），請複習講義後重新作答。'
+           +'📚 本次後測未達及格標準（70分），請複習講義後重新作答。'
            +'</div>'
            +'<div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">'
            +'<button class="btn bo" onclick="goReview()">← 回去複習講義</button>'
@@ -1258,7 +1267,7 @@ function retakePost(){
   if(!checkRateLimit())return;
   genToken();recordAttempt();_examStarted=true;
   clearInterval(tmI);document.getElementById("tmb").style.display="none";
-  postAns=new Array(10).fill(null);postCq=0;postT0=Date.now();startTm();
+  postAns=new Array(10).fill(null);postCq=0;postT0=Date.now();startTm(showPostRs);
   show("scPost");renderPostQ();sfxNext();
 }
 
@@ -1416,6 +1425,66 @@ function doPost(e) {
   } catch(error) {
     return ContentService.createTextOutput(JSON.stringify({"status": "error", "message": error.toString()}));
   }
+}
+
+function submitScoreToSheet() {
+  const K2 = ["A","B","C","D"];
+  const preLetters = preAns.map(function(a) { return a !== null ? K2[a] : ""; });
+  const postLetters = postAns.map(function(a) { return a !== null ? K2[a] : ""; });
+  const preSc  = preAns.reduce(function(acc,v,i){return acc+(v===_qa(PRE_QS[i])?1:0);},0);
+  const postSc = postAns.reduce(function(acc,v,i){return acc+(v===_qa(QS[i])?1:0);},0);
+  try {
+    fetch(_API, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        action: "SUBMIT_SCORE",
+        clinicName: ud.cl,
+        clinicCode: ud.or,
+        userName:   ud.nm,
+        userTitle:  ud.ti,
+        preAnswers:  preLetters,
+        postAnswers: postLetters,
+        preScore:  preSc,
+        postScore: postSc
+      })
+    }).catch(function(err){ console.error("API error:", err); });
+  } catch(e) { console.error("API error:", e); }
+}
+
+function submitSurveyToSheet(preSc, postSc) {
+  const labels = ["非常滿意","滿意","普通","不滿意","非常不滿意"];
+  var q6Checked = Array.from(document.querySelectorAll("input[name=sq6]:checked"))
+                       .map(function(el){return el.value;}).join("、");
+  var q6OtherEl = document.getElementById("sq6OtherText");
+  var q6Other = q6OtherEl ? q6OtherEl.value.trim() : "";
+  var q6Final = q6Checked + (q6Other ? "（其他：" + q6Other + "）" : "");
+  var q7El = document.getElementById("sq7");
+  var q7 = q7El ? q7El.value : "";
+  try {
+    fetch(_API, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {"Content-Type": "text/plain;charset=utf-8"},
+      body: JSON.stringify({
+        action: "SUBMIT_SURVEY",
+        clinicName: ud.cl,
+        clinicCode: ud.or,
+        userName:   ud.nm,
+        userTitle:  ud.ti,
+        preScore:   preSc,
+        postScore:  postSc,
+        q1_fit:           labels[svRatings[0]],
+        q2_practical:     labels[svRatings[1]],
+        q3_schedule:      labels[svRatings[2]],
+        q4_comprehension: labels[svRatings[3]],
+        q5_confidence:    labels[svRatings[4]],
+        q6_interests:     q6Final,
+        q7_feedback:      q7
+      })
+    }).catch(function(err){ console.error("API error:", err); });
+  } catch(e) { console.error("API error:", e); }
 }
 
 </script>
