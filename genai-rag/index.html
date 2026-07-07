@@ -970,11 +970,16 @@ body{font-family:'Noto Sans TC',sans-serif;background:
 </div>
 
 <script>
+// ══ 防嵌入與警告 ══
+if(window.top!==window.self){try{window.top.location=window.self.location;}catch(e){document.body.innerHTML='<div style="padding:40px;text-align:center;font-family:sans-serif">此頁面不允許嵌入外部網站</div>';}}
+console.log('%c⚠ 安全提醒','color:red;font-size:24px;font-weight:bold');
+console.log('%c本測驗系統受到監控。任何透過開發者工具竄改答案、分數或次數限制的行為，均會在後台留下異常紀錄。','color:#c00;font-size:14px');
+
 
 // ══ SECURITY ══
-const _K=78;
-function _qa(q){const b=atob(q._a);return b.charCodeAt(0)^_K;}
-function _qe(q){const b=atob(q._e);const bytes=new Uint8Array(b.length);for(let i=0;i<b.length;i++)bytes[i]=b.charCodeAt(i)^_K;return new TextDecoder().decode(bytes);}
+const _K=(function(){var p1=String.fromCharCode(84,110),p2=(2026).toString(),p3=["G","e","n","A","I"].join("");var s=p1+p2.slice(0,2)+p2.slice(2)+p3;var a=[];for(var i=0;i<s.length;i++)a.push(s.charCodeAt(i));return a;})();
+function _qa(q){const b=atob(q._a);return b.charCodeAt(0)^_K[0];}
+function _qe(q){const b=atob(q._e);const bytes=new Uint8Array(b.length);for(let i=0;i<b.length;i++)bytes[i]=b.charCodeAt(i)^_K[i%_K.length];return new TextDecoder().decode(bytes);}
 // ── 音效 ──
 const AC=new(window.AudioContext||window.webkitAudioContext)();
 function _beep(f,d,t,v){t=t||'sine';v=v||0.25;try{const o=AC.createOscillator(),g=AC.createGain();o.connect(g);g.connect(AC.destination);o.type=t;o.frequency.value=f;g.gain.setValueAtTime(v,AC.currentTime);g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+d);o.start();o.stop(AC.currentTime+d);}catch(e){}}
@@ -991,14 +996,28 @@ document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&['c',
 document.addEventListener('selectstart',function(e){var t=e.target.tagName;if(['INPUT','TEXTAREA','SELECT'].indexOf(t)===-1)e.preventDefault();});
 // ── Token ──
 var _tok=null,_tokUsed=false;
-function genToken(){_tok=Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);_tokUsed=false;}
-function validateToken(){if(!_tok||_tokUsed){showBlocked('Token 已失效，請重新填寫資料後再考試。');return false;}return true;}
-function burnToken(){_tokUsed=true;_tok=null;}
+var _tokTs=0;
+function genToken(){_tok=Math.random().toString(36).slice(2)+Date.now().toString(36)+Math.random().toString(36).slice(2);_tokUsed=false;_tokTs=Date.now();}
+function validateToken(){
+  if(!_tok||_tokUsed){showBlocked('Token 已失效，請重新填寫資料後再考試。');return false;}
+  if(Date.now()-_tokTs>7200000){burnToken();showBlocked('作答時效已過期（2小時），請重新填寫資料。');return false;}
+  return true;
+}
+function burnToken(){_tokUsed=true;_tok=null;_tokTs=0;}
 // ── 次數限制 5次/24h ──
 var _RLK='exam_rl_m3';
-function _getRl(){try{var raw=localStorage.getItem(_RLK);return raw?JSON.parse(raw):{count:0,ts:0};}catch(e){return{count:0,ts:0};}}
+function _rlSig(count,ts){var s=count+'|'+ts+'|'+_K.join(',');var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h+s.charCodeAt(i))|0;}return h.toString(36);}
+function _getRl(){
+  try{
+    var raw=localStorage.getItem(_RLK);
+    if(!raw)return{count:0,ts:0};
+    var o=JSON.parse(raw);
+    if(o.sig!==_rlSig(o.count,o.ts)){return{count:99,ts:Date.now()};}
+    return o;
+  }catch(e){return{count:0,ts:0};}
+}
 function checkRateLimit(){var rl=_getRl(),now=Date.now(),win=86400000;if(now-rl.ts>win)return true;if(rl.count>=5){var m=Math.ceil((win-(now-rl.ts))/60000);showBlocked('您今日已達考試上限（5次）。\n請於'+m+'分鐘後再試。');sfxLock();return false;}return true;}
-function recordAttempt(){var rl=_getRl(),now=Date.now(),win=86400000;if(now-rl.ts>win){rl={count:1,ts:now};}else{rl.count++;}localStorage.setItem(_RLK,JSON.stringify(rl));}
+function recordAttempt(){var rl=_getRl(),now=Date.now(),win=86400000;if(now-rl.ts>win){rl={count:1,ts:now};}else{rl.count++;}rl.sig=_rlSig(rl.count,rl.ts);localStorage.setItem(_RLK,JSON.stringify(rl));}
 function getRemaining(){var rl=_getRl(),now=Date.now();if(now-rl.ts>86400000)return 5;return Math.max(0,5-rl.count);}
 // ── 封鎖畫面 ──
 function showBlocked(msg){if(document.getElementById('blockOv'))return;document.body.insertAdjacentHTML('beforeend','<div id="blockOv" style="position:fixed;inset:0;background:rgba(10,22,40,.92);z-index:9999;display:flex;align-items:center;justify-content:center"><div style="background:#fff;border-radius:16px;padding:36px 32px;max-width:420px;text-align:center"><div style="font-size:48px;margin-bottom:12px">&#128274;</div><div style="font-size:16px;font-weight:700;color:#0d4a8a;margin-bottom:10px">存取受限</div><div style="font-size:14px;color:#555;white-space:pre-line;line-height:1.8">'+msg+'</div></div></div>');}
@@ -1040,28 +1059,28 @@ function toggleExt(n){
 
 // quiz
 const PRE_QS=[
-  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"TA==",_e:"qdrRqMbeq/LBbg8Hbqr2w6jSzavA9ab9yajY16v05aje0qv+xanB8KjG3qrx76r1+KHywqbOwqjW4aju96jd1Kvj9qnx3KvG/qnUyqbk0KbmzqbowavHyanb+Kr2xa3Owqna0ajG3q3Ow6vL5qjY/qvL6avg963OzA=="},
-  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"Tw==",_e:"q8z9qfv/bg8HofLGq8bqq8brq/LBbg8HofLHqN3Lp9v5rc7CqMfwpujBq/DFq9zCq8/Uq8bIp+/Qrc7DofLCqvDFq+jMqfzwqPTYq8bqq8brbhZuq8vHqcfJqNbhq97oqNLHqdv+q/b2rc7M"},
-  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"Tw==",_e:"q8z9qfv/bg8HbqvB5KbN86vw0KjZ7KjSx6fP9qfuy6jH8Knj2qjvxqHywqr2w6jSza3OwqvH+6fO7q3Ow6r2w6vj1qvS5qnUyqjT/6br8a3OzA=="},
-  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"Tw==",_e:"AgIDbqfT7qbmxqng2a3Owqr2xar2zqvOxavj2anUyqjn0anAya3Ow6Hywqr2zqvOxavj2ar2zqvOxavj2a3OwqjA663Ow6vJ9KvL6avg963OzA=="},
-  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"TA==",_e:"qMDCqMHvbgkrIG4PB26o1uGm6M+m4N2myeSr+f+oxt6pzPSnzO2rzsWtzsKoycyr8NmowsmoweBuDwduqdTKqfbzqeDvrc7Drc7M"},
-  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"Tw==",_e:"DwduqdTKqdHrpuPWq8/SqdvXq9Lmpubdqfn6qNfMp9jdp/XQofLCpufsq9vBqNLOqNj+qP3bpujBqNLNp8/Jq8b+pv3JpubErc7CqNfMp9jdq/ngrc7Dq9vBp+/Crc7M"},
-  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"Tw==",_e:"qenfq+P2q+D4p9jFqdfyq8n0bhwPCaHyxhwrOjwnKzgvImMPOykjKyA6KypuCSsgKzwvOichIKHywqjk7Kn67Kvs0Kvy+ana0ajG3qHyx6rwyKbp7aj/9G4PB26p1Mqq9ser6umr8v+n9dCtzsw="},
-  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"Tw==",_e:"ACE6KywhISUCA26o1uFuCSEhKSIrbqjA5qvJ9KnUyqvLw6b89W4cDwluq/nrq8v5ofLCqcrvp9LOqebFq/LBps3CqNfhq8P9q8Hhq/X0qeXFq/7Gq//iqdHrpuPWq/Tlrc7M"},
-  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"TA==",_e:"HA8Jbqrw06r2xKvM/ab9yajY16vV0Knj2qHywqbF66b9yajY16jS4qb05afC4abk6qHywg8Hbqr1w6jSzan76KvJ9KfC4abk6qnj2qjvxq3OzA=="},
-  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"TA==",_e:"qObvqfvKbgN9bqnUyqju9qvxzan88Knr0KHy1K3OwqnSxajJzKv39abo9KHywqn88Kj02KjB3qvbwaHywqjH3afO7qv+xqv/4qvq6abL6K3OzK3Oww=="}
+  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"Vg==",_e:"s/qt1rqmotnhYQgdTtaIv9Db5ovP8rzdtdakr6LfxafZyIuCu9W5+YPm0a3rz9aLhNn76YbBxbL2ndaSj6H29KTk7ImNote+94L0xaH+8NqYst7h6ovIzrP7hNSKvaTl4qbdy4i6oNG2yoDr6a/C3te1ldPp3I3Byw=="},
+  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"VQ==",_e:"seyB14eHZyQnrvXci7qU177igNLOaRUn3Yy70NTgh9T+t+6+1ruIr8PhpPffi6C817fdgObHoPXw0bC/2fvpiv/Csciw14CIod/4pMHwi7qVEm5ngOvIrt3p1Kid09fDiN3As/uC1YqOpOXs"},
+  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"VQ==",_e:"seyB14eHZyQnYazbxNqzj9P5+4jW67Lyu9mzjq7F66fA6omfpNSXz4rSza3s49SssdXH6YvI/L3uktOyu6Pd46TkzIuumNWsw4Pz8KHx0dGwsA=="},
+  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"VQ==",_e:"GCJ/ENur543Gya76+dGwvtL/7or5ybHuudWfoaD/6qfgy4m8t9G2yorSza3s7tewudPq8or5ybHuudWfoaTl4qfH8Y2yvdex/YDr5qz619GwsA=="},
+  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"Vg==",_e:"suC+1r2XZyILL2kVJxLWqpmvw++p58eGtZrXgfaD5tGu1tTbspHTx+6NwcWy6bDVjKGh6emnxvpOc3kS0d3hifn0s8CT07K7pOXs"},
+  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"VQ==",_e:"FScS16iyoPrLqeTMi7Os1aPegPLpofz91YeG0N7nh9favdWs3466r8zMpNzbiK6w1KD3g93UofLh1Kyx38bii8n5vN212Jq8pOXip9DWh6Sj14Hphu7MrMHh25G+1cfn"},
+  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"VQ==",_e:"s8mj1Z+OosvYqN/fiauM17H9RTwADrvSumJXQjUMCzcoOENzRVVbIgsaJC10KVdeV0QmEQcuJ7vSvtaYlKDRzKTryouOh9Wi2IPm0abo59aOtN7gxojw83QvexDVrMOB1sis8MnXjIPf/PuNwcs="},
+  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"VQ==",_e:"GgFGVVBZKA4iDGmy9p0QdVkoAgIkabLgmtW1jKD/6qTM2YaAixJkBiJOpP7xi7eH3YrLgurgoMju1Zi50/vqhsLFsved1b+FourBpPLuiZm714bPgN/trsvL2p2q0/3OjcHL"},
+  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"Vg==",_e:"Bi91ENaI2oHWy6zW3dqDtdDR/Iva17PDpt+Ouq/uy6n604ikqdSq643U6qDYwdqaltn76S8IabDVv9autaDQyKTO7oe+n9qc44LD1a/15tGwsA=="},
+  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"Vg==",_e:"ssaT14eyZyhdYa7O6tSQitP45onz97PLrN+OrKTl4qbV34i1steP/I3I+6bo4tWCjND984jO2bH7vd+OuqHs/ajJ9IuCuNeH64DK5qHRyNGwsNXH6A=="}
 ]
 const QS=[
-  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"TA==",_e:"qdrRqMbeq/LBbg8Hbqr2w6jSzavA9ab9yajY16v05abt76je0qv+xanB8KjG3qrx76r1+Kbqyabt86b88qr2xKHywqbOwqjW4aju96jd1Kvgzavj9qnx3KvG/qnUyqbk0KbmzqbowavHyavcwqfMwaby4aHywqnb+Kr2xa3Owqna0ajG3q3Ow6vJ9Kr2zqvOxavL5qr22KnbwqnD5qr2zqnK76r0wqnUyqvL5qjY/qvL6avg963OzA=="},
-  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"Tw==",_e:"q8z9qfv/qdTKbg8HofLGqvfRq/7/qNbhq8bqq8brq/LBbg8HofLHp9PQq/b2qN3Lp9v5rc7CqMfwpujBq/DFrc7Dq9zCrc7Cq8/Uq8bIp+/Qrc7DofLCqvDFq+jMqfzwqPTYq8bqq8brbhary8epx8mo1uGr3uio0sep2/6r9vatzsw="},
-  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"Tw==",_e:"q8z9qfv/bg8HbqnUyqv566rz0qju9qvxzajW4avw0KjZ7KjSx6fP9qfuy6r246jH8KvJ9Knj2qjvxqHywqvgzavO36r2w6jSza3OwqvH+6fO7q3Ow6r2w6vj1qvS5qnUyqjT/6br8aHy1abN863Owqna0ajG3q3Ow6vL5qjY/qvL6avg96nUyqjW4ana0ajG3qvywW4PB63OzA=="},
-  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"Tw==",_e:"AgIDbqfT7qbmxqng2a3Owqr2xar2zqvOxavj2anUyqjn0anAya3Ow6Hywqr2zqvOxavj2ar2zqvOxavj2a3OwqjA663Ow6vJ9KvL6avg963OzA=="},
-  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"TA==",_e:"qMDCqMHvbgkrIG4PB26q9sOo1uGm6M+m4N1uDwduq8HYqvXtqMbfq87fofLCps7CqNbhpujPpuDdpsnkq/n/qMbeqcz0p8ztq87Frc7CqMnMq/DZqMLJqMHgbg8HbqnUyqn286ng763Ow63OzA=="},
-  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"Tw==",_e:"DwduqdTKqdHrpuPWqvDIpsnkqNjyq+DNpuzlpubdqfn6qdTKp8ztqOD7qNfMp9jdrc7Mq+jMqNDSq+DNqdTKpubWqMj4q8/SqdvXq9Lmbnx+fH1uq/f6ofLCpufsq9vBbnx+fHhuq/f6qdTKqNLOqNj+qP3bpujBq/7/qNLNp8/Jq8b+pv3JpubEqNX6qNj+qdTKrc7CqNfMp9jdq/ngrc7Dq9vBp+/Crc7M"},
-  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"Tw==",_e:"qcz0qvTIpuntqP/0p87XqvTVqdnVp/XQofLCqenfq+P2q+D4p9jFqdfyq8n0qvTIqvbOq+vZq8vmqNj+qdTKq8PaqvPSqOfRq8b4rM7aHA8JofLGHCs6PCcrOC8iYw87KSMrIDorKm4JKyArPC86JyEgofLCqOTsqfrsq+zQq/L5qdrRqMbeofLHrc7M"},
-  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"Tw==",_e:"CSEhKSIrbqjA5qvJ9KnUym4AITorLCEhJQIDbqjW4anM9Kjj6qbOwqna0anUyqvLw6b89av566vL+aHywqvgwqnwwKfl2qnB8G4cDwluqOjMq/H7ofLCpuDdqMzmqcrvp9LOqvX1qvPbqebFq/LBps3CqNfhq/7/ps3zq/X0qeXFq/7Gq//iqdHrpuPWq/Tlrc7M"},
-  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"TA==",_e:"qNnsqcr4bhwPCW6o1uGr0fSo2PKoxt+rzt+owd6q8NWp1Mqm/cmo2Neq8Mir1dCp49qh8san2MWrw/mmzs2h8seh8sKr6Myo0NKq9sSrzP2p1Mqo2Mmq9fio0uKm9OWnz8Co18yoxtinwuGm5Oqh8sIPB26nzMqo1uGo0s2q8NOo3dSo4+qp++iryfSnwuGm5Oqp1Mqp49qo78ah8sKnzteowd6nyNyoxt+rzt+o2eur9vao2Mmq9fip4O+p3sip1MqnycOm6M+ozumtzsw="},
-  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"TA==",_e:"qObvqfvKbgN9bqbk/KnmxanUyqju9qvxzan88Knr0KnM9KHy1K3OwqnSxajJzKv39abo9KHywqn88Kj02KjB3qvbwaHywqjH3afO7qv+xqv/4qvq6abL6K3OzK3Oww=="}
+  {q:"生成式 AI（Gen AI）之所以被稱為「創作者」，是因為當你請它寫一封婉拒廠商的信件時，它是怎麼做的？",o:["去資料庫搜尋一封現成的信件複製貼上", "打電話給廠商主管拒絕", "根據學習到的語言規則和邏輯，當下生成獨一無二的全新內容", "隨機吐出幾個英文字母湊合"],_a:"Vg==",_e:"s/qt1rqmotnhYQgdTtaIv9Db5ovP8rzdtdakr6Lfxanq9YiirNeGzILh/6/c/taPk9L804blzrzNj9iAiqPd5K712IayvNSu6IPO+K/H9NeesdPq3Yn+27Hmgteosq/P8Knh1IaUv9e/wID8zaDW4dqMndn76YnU/7DWudOyuqDx8afBxI2yvdex/YHWwazU5de1mtL/84nUxbPjmtSKtqDhz6Xz2ImotNez74P48azRydeei9XH5w=="},
+  {q:"小美在檢驗科(部)工作，醫院有一套可以從十萬張X光片中精準揪出腫瘤的 AI 系統。請問這屬於哪一種 AI？",o:["生成式 AI", "判別式 AI（傳統 AI）", "情感分析 AI", "聊天機器人"],_a:"VQ==",_e:"seyB14eHoP/qYQgdgY641o/YgN7wr8zB17iW08/Ai/3GdC97346/rvjwpPHsiKG126Pwhu7Nr93Q2pa90/nujcHEsfy+07K6ouT0pMHSh5Ou0bbKitLNrerl15aw0fXbiPvfseaW1bqTZz2LxMCz57XWqpmi9cin1d2Jp4DXjv+G7sM="},
+  {q:"承上題，如果小美今天要求這套看X光片的傳統 AI 系統「幫我畫一顆長得像鳳梨的蘋果」，AI 會有什麼反應？",o:["立刻畫出一張精美的鳳梨蘋果圖", "無法完成，因為傳統 AI 不會「創造」不存在的東西", "會發脾氣並罷工", "會去 Google 搜尋一張照片貼過來"],_a:"VQ==",_e:"seyB14eHZyQnYa7O6teHl9L6+Yjh8bHRsdaqmaLb8Kfe9oiuudu3/4zOxK3sw9S5jNPA34ns3bLPut+OuqLL7aTJxYqKvdSqxIbuzazd29uwktXH6Ir5xLHDqtWunqD/6qfU5YaXj92K3I3t/KrU4tWkrdDP9Y3BxLHrmtakhqLgyaTn7YmotNSu6IL63q/c/teMvRYGLI3Byw=="},
+  {q:"大型語言模型（LLM）產生文字的基本原理，最接近下列哪一個比喻？",o:["死背整本字典", "文字接龍——依機率預測下一個最可能出現的字", "完全隨機亂數", "從網路複製貼上現成文章"],_a:"VQ==",_e:"GCJ/ENur543Gya76+dGwvtL/7or5ybHuudWfoaD/6qfgy4m8t9G2yorSza3s7tewudPq8or5ybHuudWfoaTl4qfH8Y2yvdex/YDr5qz619GwsA=="},
+  {q:"AI 時代的工作哲學發生了改變，我們學習 Gen AI 的最終目標是什麼？",o:["為了讓 AI 取代我們，提早退休", "為了背誦複雜的程式碼", "讓自己成為那個「懂得指揮 AI 的總管」", "為了證明人類比電腦笨"],_a:"Vg==",_e:"suC+1r2XZyILL2kVJxLUiruh/cGp79WGnKMSdw5Fi87fsNWR1rqnouX/rvXYhrK81K7ojcjAofr92reY0/DUiMnZs+yI2bCVouXlosnYiLWy14jQg+LGr9vAEnF7FqD/6qbx6YmckdG2yobuww=="},
+  {q:"小陳問 AI 關於 2026 年最新發布的醫療法規，AI 卻給了 2023 年的舊資料。這暴露出純生成式 AI 的哪個致命弱點？",o:["缺乏同理心", "資訊更新的「時間差」", "數學運算能力不足", "語言不通"],_a:"VQ==",_e:"FScS16iyoPrLqeTMioy22rHtg/j9rPrt2pKZ3u/2ifb9s/S22bCVocvbp9DWh6Sj0bbFgMjDr8ry156x0d3hhunRsuiE1bOqoPD3pNX8TgAAAAVngNf1puji2pmQ09LqTnN5ZlgS1YuCoP/qp9XUiKSA1IXSjcjOrOTf1Kyx38bii8n5vN212Jq8of7ap9/kiai00bbLg/fDoML914ec1cfoi9TGvc++07K0"},
+  {q:"為了解決 AI 的三大弱點，科學家沒有把 AI 打掉重練，而是開發出一套全新的協作機制。這個機制的簡稱是什麼？",o:["RPG", "RAG（檢索增強生成）", "RGB", "RNG"],_a:"VQ==",_e:"s+yI1Iiwr8LNp/juh7Kp1ozcgvnaoO/w3Yy+0eD0i+zxscCE2aS9oPzSpM7uioi21o7HgMvWrNHG1KaC0d3hi8zdsNOu1pupou3Yo8nAPHN33YrPNws1Oz0LRFFeGwYQCSwsOhpXVBJxIgsLMyggB11e3YrLg8TjruDM15Ks0/vSidXWsuai346/pOXs"},
+  {q:"我們一般人不會寫程式，如果想體驗具 RAG 功能的生成式 AI，可以使用 Google 推出的哪一套免費工具？",o:["Google Maps", "NotebookLM", "Google Calendar", "Gmail"],_a:"VQ==",_e:"EwFdV15TZ4Pg6azT1NWqthYJChokKzsBWXx/FqH9wabL7oiflNq2y4L63q7O6te1v9713ov27LHrhd+OuqLL4qb32oeZpNW5+UU8AA50iJSy14nyitLNofr91LKa0cPEh93JsNWJ1I+joM3lpPXbhrG81K/ogN7wodfT14uI0ezui/HBsd+e162Tr8j2pPP/jbKy"},
+  {q:"雖然 RAG 可以有效消除 AI 的幻覺，但如果我們自己上傳到 NotebookLM 的檔案內容本身就是舊的、錯的，AI 會發生什麼事？",o:["AI 會自動幫你聯絡原作者要求更正", "AI 會上網找正確的來糾正你", "因為是開卷考，AI 還是會根據你給的錯誤資料給出錯誤答案", "系統會直接當機崩潰"],_a:"Vg==",_e:"svmQ17aAZzcvBmmy9p3VrYyh89KnwcWLsqHUudeB0Nquzurag7XQ0fyK/8+x9azXn6Ko2eao39+Lv4fatsSK0sim6OLXlrDQ2fmK+cOx7IHXqLKh8+ml8uKIrpzajOyM78+vzezUuKTfy8qG6+270r5xexau5+qn0fuIrrPWiNqD/duv+crVhZTTwN+Hzea8xJbXqLKgyPqn6NyBjrzbtt6D4dGg0vzUuKPTx/SI1uyx1orWpLGj3tim5/WJorbVrMOM6cyh8u/UsJXVx+c="},
+  {q:"總結這堂「模組 M3 教學」，這堂課想傳達的核心精神是什麼？",o:["盲目相信，一切交給 AI", "死背程式碼，自己刻出一個模型", "看懂幻覺，精準提問，打造專屬大腦", "拒絕科技，回歸紙筆"],_a:"Vg==",_e:"ssaT14eyZyhdYaH+3NWYudHd4Yjh8bHRsdeAiKDA8KbL7oGOqtG2y4Lyyq/T7NeJid7h34H9xbPcjNaIoKHq/qTc24GOvNS/1Izu4azk5teBntPjwobE77fusNOyuw=="}
 ]
 const K=["A","B","C","D"];
 let cq=0,ans=new Array(10).fill(null),tmI,t0;
