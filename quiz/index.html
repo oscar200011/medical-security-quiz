@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>醫療健康題庫中心</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏥</text></svg>">
     <style>
         * {
             margin: 0;
@@ -363,9 +364,242 @@
                 opacity: 0.1;
             }
         }
+        /* LINE 瀏覽器提示橫幅 */
+        .line-browser-banner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #00c300 0%, #00b300 100%);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            line-height: 1.6;
+        }
+
+        .line-browser-banner.show {
+            display: block;
+        }
+
+        .line-browser-banner strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 1.05rem;
+        }
+
+        .line-browser-banner .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.25);
+            border: none;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        body.line-banner-active {
+            padding-top: 90px;
+        }
+
+        @media (max-width: 768px) {
+            body.line-banner-active {
+                padding-top: 110px;
+            }
+        }
+        /* 查看教材按鈕 */
+        .view-materials-btn {
+            width: 100%;
+            background: white;
+            border: 2px solid #ffb3d9;
+            color: #e91e63;
+            padding: 12px 20px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .view-materials-btn:hover {
+            background: #ffe0ec;
+            transform: scale(1.02);
+        }
+
+        /* Lightbox 彈出視窗 */
+        .lightbox-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .lightbox-overlay.active {
+            display: flex;
+        }
+
+        .lightbox-image-wrap {
+            max-width: 90vw;
+            max-height: 75vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .lightbox-image-wrap img {
+            max-width: 90vw;
+            max-height: 75vh;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .lightbox-nav:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .lightbox-prev {
+            left: -70px;
+        }
+
+        .lightbox-next {
+            right: -70px;
+        }
+
+        .lightbox-counter {
+            color: white;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        .lightbox-thumbs {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 90vw;
+        }
+
+        .lightbox-thumb {
+            width: 60px;
+            height: 45px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            opacity: 0.5;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .lightbox-thumb.active {
+            opacity: 1;
+            border-color: #ff99cc;
+        }
+
+        .lightbox-thumb:hover {
+            opacity: 0.85;
+        }
+
+        @media (max-width: 768px) {
+            .lightbox-prev {
+                left: 5px;
+            }
+            .lightbox-next {
+                right: 5px;
+            }
+            .lightbox-nav {
+                width: 40px;
+                height: 40px;
+                font-size: 1.3rem;
+            }
+            .lightbox-thumb {
+                width: 45px;
+                height: 34px;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- LINE 瀏覽器提示橫幅 -->
+    <div class="line-browser-banner" id="lineBanner">
+        <button class="close-btn" onclick="document.getElementById('lineBanner').classList.remove('show'); document.body.classList.remove('line-banner-active');">✕</button>
+        <strong>⚠️ 偵測到您正在使用 LINE 內建瀏覽器</strong>
+        點擊右上角「...」選單 → 選擇「在瀏覽器開啟」以獲得最佳體驗
+    </div>
+
+    <!-- Lightbox 彈出視窗 -->
+    <div class="lightbox-overlay" id="lightboxOverlay" onclick="if(event.target === this) closeLightbox();">
+        <div class="lightbox-image-wrap">
+            <button class="lightbox-close" onclick="closeLightbox();">✕</button>
+            <button class="lightbox-nav lightbox-prev" onclick="changeSlide(-1);">‹</button>
+            <img id="lightboxImage" src="" alt="教材圖片">
+            <button class="lightbox-nav lightbox-next" onclick="changeSlide(1);">›</button>
+        </div>
+        <div class="lightbox-counter" id="lightboxCounter"></div>
+        <div class="lightbox-thumbs" id="lightboxThumbs"></div>
+    </div>
+
     <!-- 背景裝飾 -->
     <div class="bg-decoration deco-1">🩺</div>
     <div class="bg-decoration deco-2">💊</div>
@@ -410,6 +644,10 @@
                                 <span>種子教師必修課程</span>
                             </div>
                         </div>
+
+                        <button class="view-materials-btn" onclick="event.preventDefault(); event.stopPropagation(); openLightbox();">
+                            📖 查看教材
+                        </button>
 
                         <div class="card-footer">
                             <div class="card-category">📊 健康篩檢</div>
@@ -504,5 +742,91 @@
             </a>
         </div>
     </div>
+
+    <script>
+    // ===== 教材 Lightbox =====
+    var colonMaterials = [
+        'https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/quiz/colon-materials/colon-slide-1-overview.png',
+        'https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/quiz/colon-materials/colon-slide-2-referral.png',
+        'https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/quiz/colon-materials/colon-slide-3-ai-training.png',
+        'https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/quiz/colon-materials/colon-slide-4-genai.png',
+        'https://raw.githubusercontent.com/oscar200011/medical-security-quiz/main/quiz/colon-materials/colon-slide-5-community.png'
+    ];
+    var currentSlide = 0;
+
+    function openLightbox() {
+        currentSlide = 0;
+        renderLightbox();
+        document.getElementById('lightboxOverlay').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightboxOverlay').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function changeSlide(direction) {
+        currentSlide += direction;
+        if (currentSlide < 0) currentSlide = colonMaterials.length - 1;
+        if (currentSlide >= colonMaterials.length) currentSlide = 0;
+        renderLightbox();
+    }
+
+    function goToSlide(index) {
+        currentSlide = index;
+        renderLightbox();
+    }
+
+    function renderLightbox() {
+        document.getElementById('lightboxImage').src = colonMaterials[currentSlide];
+        document.getElementById('lightboxCounter').textContent = (currentSlide + 1) + ' / ' + colonMaterials.length;
+
+        var thumbsContainer = document.getElementById('lightboxThumbs');
+        thumbsContainer.innerHTML = '';
+        colonMaterials.forEach(function(src, index) {
+            var thumb = document.createElement('img');
+            thumb.src = src;
+            thumb.className = 'lightbox-thumb' + (index === currentSlide ? ' active' : '');
+            thumb.onclick = function() { goToSlide(index); };
+            thumbsContainer.appendChild(thumb);
+        });
+    }
+
+    // 鍵盤操作
+    document.addEventListener('keydown', function(e) {
+        var overlay = document.getElementById('lightboxOverlay');
+        if (!overlay.classList.contains('active')) return;
+
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') changeSlide(-1);
+        if (e.key === 'ArrowRight') changeSlide(1);
+    });
+    </script>
+
+    <script>
+    (function() {
+        var ua = navigator.userAgent || '';
+        var isLine = /Line/i.test(ua);
+        
+        if (isLine) {
+            var url = new URL(window.location.href);
+            var alreadyTried = url.searchParams.get('openExternalBrowser');
+            
+            if (!alreadyTried) {
+                // 第一次偵測到 LINE 瀏覽器，嘗試自動用外部瀏覽器開啟
+                url.searchParams.set('openExternalBrowser', '1');
+                window.location.href = url.toString();
+            } else {
+                // 已經嘗試過自動跳轉，但仍在 LINE 瀏覽器中（部分機型/版本無法自動跳轉）
+                // 顯示手動操作提示
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('lineBanner').classList.add('show');
+                    document.body.classList.add('line-banner-active');
+                });
+            }
+        }
+    })();
+    </script>
 </body>
 </html>
