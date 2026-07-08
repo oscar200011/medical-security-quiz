@@ -87,7 +87,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .step-label{font-size:.72rem;color:#6a8aaa;font-weight:500;white-space:nowrap;}
 .step-label.active{color:#0066cc;font-weight:700;}
 .step-label.done{color:#00a86b;}
-.step-line{width:48px;height:2px;background:#c0d4ee;margin-bottom:1.2rem;flex-shrink:0;}
+.step-line{width:34px;height:2px;background:#c0d4ee;margin-bottom:1.2rem;flex-shrink:0;}
 .step-line.done{background:#00a86b;}
 .start-btn:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,102,204,.35);}
 
@@ -228,6 +228,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 @media print{body *{display:none!important;}body::after{content:'本測驗內容禁止列印';display:block!important;font-size:1.2rem;padding:2rem;}}
 #quiz-screen,.q-text,.opt-btn,.context-body{-webkit-touch-callout:none;}
 @media(max-width:600px){
+  .step-line{width:14px;}
+  .step-circle{width:26px;height:26px;font-size:.75rem;}
+  .step-label{font-size:.6rem;}
   .form-grid{grid-template-columns:1fr;}.fg.full{grid-column:1;}.fg{grid-column:1;}
   .nav-dots{gap:.3rem;}.ndot{width:26px;height:26px;font-size:.68rem;}
   .stats-grid{gap:.5rem;}.stat-val{font-size:1.4rem;}
@@ -275,7 +278,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="plan-tag">「健康台灣深耕計畫」</div>
     <h1 class="main-title">臺南愛（AI）腸篩<br>大腸癌擴篩完治 × AI轉診<br>智慧平台精進計畫</h1>
   </div>
-  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行前測 → 圖卡閱讀 → 後測</p>
+  <p class="subtitle" style="font-size:1.05rem;font-weight:600;color:#0055aa;margin-bottom:1.25rem;">填寫下方資料後，點「下一步」進行前測 → 圖卡閱讀 → 後測 → 課後問卷</p>
 
   <div class="steps-bar">
     <div class="step-item">
@@ -296,6 +299,11 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="step-item">
       <div class="step-circle" id="step4-circle">4</div>
       <div class="step-label" id="step4-label">後測</div>
+    </div>
+    <div class="step-line" id="step-line4"></div>
+    <div class="step-item">
+      <div class="step-circle" id="step5-circle">5</div>
+      <div class="step-label" id="step5-label">課後問卷</div>
     </div>
   </div>
 
@@ -394,7 +402,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     </div>
 
     <div class="result-btns">
-      <button class="btn-primary" id="btn-survey" onclick="playSound('nav');showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);animation:pulseSurvey 1.6s ease-in-out infinite;">📝 填寫課後問卷</button>
+      <button class="btn-primary" id="btn-survey" onclick="playSound('nav');setStep(5);showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);animation:pulseSurvey 1.6s ease-in-out infinite;">📝 填寫課後問卷</button>
       <button class="btn-secondary" onclick="playSound('nav');showReview()">📋 查看解析</button>
       <button class="btn-secondary" onclick="playSound('nav');restartAll()">重新考試</button>
     </div>
@@ -663,7 +671,7 @@ function startPreTest(){
 }
 
 function setStep(n){
-  for(let i=1;i<=4;i++){
+  for(let i=1;i<=5;i++){
     const circle = document.getElementById('step'+i+'-circle');
     const label  = document.getElementById('step'+i+'-label');
     const line   = document.getElementById('step-line'+i);
@@ -1096,6 +1104,7 @@ function submitSurvey(){
   });
   // 送到後端
   submitSurveyData();
+  setStep(6); // 全部步驟標記完成
   // 停留在感謝畫面,由考生自行選擇「返回考試選單」或「查看成績與解析」
   // (先把成績頁上的問卷入口藏起來,避免回去後重複填寫)
   const btnSurvey = document.getElementById('btn-survey');
