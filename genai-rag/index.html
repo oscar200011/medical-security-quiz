@@ -961,16 +961,25 @@ body{font-family:'Noto Sans TC',sans-serif;background:
   <div class="card">
     <div class="dw">
       <div class="di">🎉</div>
-      <h2>感謝您的參與！</h2>
+      <h2 id="dTitle">感謝您的參與！</h2>
       <p id="dInfo" style="margin-bottom:14px"></p>
+      <div id="dScoreCard" style="margin-bottom:14px"></div>
+      <div style="background:var(--gl);border:1px dashed var(--bm);border-radius:var(--rs);padding:10px 16px;margin-bottom:14px;font-size:calc(var(--fs) - 1px);color:var(--bd)">
+        📸 請自行<strong>截圖</strong>此頁面留存成績紀錄，作為完課證明。
+      </div>
       <p>您的回饋將協助我們持續優化課程品質。</p>
     </div>
     <div class="bc">
-      <button class="btn bo" onclick="window.print()">列印成績單 🖨️</button>
       <button class="btn bp" onclick="window.location.href='https://oscar200011.github.io/medical-security-quiz/quiz/'">回到測驗中心 →</button>
     </div>
   </div>
+  <div class="card" id="dReviewCard" style="display:none">
+    <div class="ct">答題明細</div>
+    <p style="font-size:calc(var(--fs) - 2px);color:#88aacc;margin-bottom:12px">答錯的題目可點擊「查看解析」瞭解正確答案。</p>
+    <div id="dReview"></div>
+  </div>
 </div>
+
 
 <script>
 // ══ 防嵌入與警告 ══
@@ -1034,6 +1043,79 @@ function afs(d){fi=Math.max(0,Math.min(6,fi+d));document.documentElement.style.s
 // steps
 function sStep(n){[1,2,3,4,5].forEach(i=>{const e=document.getElementById("sp"+i),c=e.querySelector(".sc");e.className="st"+(i<n?" done":i===n?" active":"");c.textContent=i<n?"✓":i;});}
 function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));document.getElementById(id).classList.add("active");window.scrollTo({top:0,behavior:"smooth"});}
+
+// ══ 測試用：網址加 ?jump=end 可直接預覽完成頁（僅供開發測試，不影響正式作答流程）══
+(function(){
+  var params=new URLSearchParams(window.location.search);
+  if(params.get('jump')==='end'){
+    window.addEventListener('DOMContentLoaded',function(){
+      ud={cl:'測試診所',or:'123',nm:'測試員',ti:'護理師'};
+      document.getElementById('dTitle').innerHTML='🎓 恭喜 <span style="color:var(--bp)">測試員</span> 完成認證！';
+      document.getElementById('dInfo').textContent='測試員・護理師・測試診所';
+      document.getElementById('dScoreCard').innerHTML=`
+        <div class="rc2 rcp" style="margin:0 auto 12px"><div class="rsn2">9</div><div class="rd">/ 10</div></div>
+        <div class="rti">🎉 恭喜通過後測！</div>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+          <div style="background:var(--gl);border-radius:var(--rs);padding:7px 16px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)"><span style="color:#88aacc">前測：</span><strong style="color:var(--bd)">6 / 10</strong> <span style="color:#88aacc;margin-left:4px">(60%)</span></div>
+          <div style="background:var(--gl);border-radius:var(--rs);padding:7px 16px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)"><span style="color:#88aacc">後測：</span><strong style="color:var(--ok)">9 / 10</strong> <span style="color:#88aacc;margin-left:4px">(90%)</span></div>
+          <div style="background:#eafaf1;border-radius:var(--rs);padding:7px 14px;border:1px solid #a3d9b1;font-size:calc(var(--fs) - 1px);color:var(--ok)">📈 進步了 3 題！</div>
+        </div>`;
+      show('scDn');
+    });
+  }
+})();
+
+// ══ 測試用：網址加 ?debug=1 開啟除錯面板 ══
+// 用途：
+//   1) 一鍵跳到任一步驟畫面，不用每次都重新走完整流程
+//   2) 一鍵把前測/後測答案全部設為正確或錯誤，快速測試通過/未通過分支
+//   3) 自動攔截 submitScoreToSheet / submitSurveyToSheet，
+//      確保測試過程產生的假資料「不會」真的寫進 Google Sheets
+var _DEBUG=new URLSearchParams(window.location.search).get('debug')==='1';
+if(_DEBUG){
+  window.addEventListener('DOMContentLoaded',function(){
+    ud={cl:'除錯診所',or:'000',nm:'除錯員',ti:'醫師'};
+    var panel=document.createElement('div');
+    panel.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;color:#fff;padding:10px 14px;font-family:monospace;font-size:12px;z-index:99999;box-shadow:0 -4px 16px rgba(0,0,0,.3);display:flex;flex-wrap:wrap;gap:8px;align-items:center';
+    panel.innerHTML=
+      '<strong style="color:#f5a623">🐞 DEBUG MODE</strong>'+
+      '<span style="color:#888">（不會寫入 Google Sheets）</span>'+
+      '<button data-jump="scReg" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">1.填寫資料</button>'+
+      '<button data-jump="scPre" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">2.前測</button>'+
+      '<button data-jump="scRd" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">3.閱讀</button>'+
+      '<button data-jump="scPost" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">4.後測</button>'+
+      '<button data-jump="scSv" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">5.問卷</button>'+
+      '<button data-jump="scDn" style="background:#333;color:#fff;border:1px solid #555;border-radius:4px;padding:4px 10px;cursor:pointer">6.完成頁</button>'+
+      '<span style="width:1px;height:20px;background:#555;margin:0 4px"></span>'+
+      '<button id="dbgAllCorrect" style="background:#2a9d5c;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer">後測全對</button>'+
+      '<button id="dbgAllWrong" style="background:#c0392b;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer">後測全錯</button>'+
+      '<button id="dbgSubmitPost" style="background:#1a6fc4;color:#fff;border:none;border-radius:4px;padding:4px 10px;cursor:pointer">送出後測(cfmPost)</button>';
+    document.body.appendChild(panel);
+
+    panel.querySelectorAll('[data-jump]').forEach(function(btn){
+      btn.onclick=function(){
+        var id=btn.getAttribute('data-jump');
+        if(id==='scPost'&&(!postAns||postAns.every(a=>a===null))){
+          postAns=new Array(10).fill(null);postCq=0;postT0=Date.now();
+        }
+        sStep(id==='scReg'?1:id==='scPre'?2:id==='scRd'?3:id==='scPost'?4:5);
+        show(id);
+        if(id==='scPre')renderPreQ();
+        if(id==='scPost')renderPostQ();
+        if(id==='scSv')initSvTable();
+      };
+    });
+    document.getElementById('dbgAllCorrect').onclick=function(){
+      postAns=QS.map(q=>_qa(q));postCq=9;renderPostQ();
+      console.log('[DEBUG] 後測已全部設為正確答案');
+    };
+    document.getElementById('dbgAllWrong').onclick=function(){
+      postAns=QS.map(q=>{var c=_qa(q);return c===0?1:0;});postCq=9;renderPostQ();
+      console.log('[DEBUG] 後測已全部設為錯誤答案');
+    };
+    document.getElementById('dbgSubmitPost').onclick=function(){cfmPost();};
+  });
+}
 
 // user
 let ud={};
@@ -1139,7 +1221,7 @@ function showRs(){
   document.getElementById("rg").innerHTML=`<div class="rst"><div class="rsn">${sc}</div><div class="rsl">答對題數</div></div><div class="rst"><div class="rsn">${Math.round(sc/QS.length*100)}%</div><div class="rsl">得分率</div></div><div class="rst"><div class="rsn">${Math.floor(el/60)}′${String(el%60).padStart(2,"0")}″</div><div class="rsl">作答時間</div></div>`;
   document.getElementById("rb").innerHTML=QS.map((q,i)=>{
     const ok=ans[i]===_qa(q),uo=ans[i]!==null?K[ans[i]]:"未作答";
-    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap"><span style="color:var(--er);font-size:12px">您選：${uo}</span><span style="color:#aaa;font-size:12px">→</span><span style="color:var(--ok);font-size:12px">正確：${K[_qa(q)]}</span><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
+    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="margin-top:4px"><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
   }).join("");
   // 依通過/未通過決定按鈕
   var btnHtml;
@@ -1232,7 +1314,16 @@ function cfmPost(){
   if(u>0&&!confirm("您還有 "+u+" 題尚未作答，確定要提交嗎？"))return;
   burnToken();_examStarted=false;
   clearInterval(tmI);document.getElementById("tmb").style.display="none";
-  sfxSubmit();setTimeout(showPostRs,600);
+  sfxSubmit();
+  submitScoreToSheet(); // 不論通過與否，都要把這次作答紀錄送進 Google Sheets
+  const sc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0),pass=sc>=7;
+  if(pass){
+    // 通過：不顯示成績複習頁，直接進入課後問卷
+    setTimeout(function(){goSv();},600);
+  }else{
+    // 未通過：顯示成績頁，提供複習講義／重新後測選項
+    setTimeout(showPostRs,600);
+  }
 }
 function showPostRs(){
   clearInterval(tmI);document.getElementById("tmb").style.display="none";
@@ -1263,7 +1354,7 @@ function showPostRs(){
   // 答題明細
   const bd=QS.map((q,i)=>{
     const ok=postAns[i]===_qa(q),uo=postAns[i]!==null?["A","B","C","D"][postAns[i]]:"未作答";
-    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap"><span style="color:var(--er);font-size:calc(var(--fs) - 2px)">您選：${uo}</span><span style="color:#aaa">→</span><span style="color:var(--ok);font-size:calc(var(--fs) - 2px)">正確：${["A","B","C","D"][_qa(q)]}</span><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
+    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="margin-top:4px"><button class="btgl" onclick="tExp(${i})">查看解析</button></div><div class="bexp" id="ex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
   }).join("");
   document.getElementById("rb").innerHTML=bd;
   var btnHtml;
@@ -1282,7 +1373,6 @@ function showPostRs(){
            +'</div>';
   }
   document.getElementById("rsBtnArea").innerHTML=btnHtml;
-  submitScoreToSheet();
   show("scRs");
 }
 function retakePost(){
@@ -1323,10 +1413,37 @@ function subSv(){
   document.getElementById("svErr").style.display="none";
   const postSc=postAns.reduce((a,v,i)=>a+(v===_qa(QS[i])?1:0),0);
   const preSc=preAns.reduce((a,v,i)=>a+(v===_qa(PRE_QS[i])?1:0),0);
+  const pass=postSc>=7;
   // 送出問卷到 Google Sheets
   submitSurveyToSheet(preSc, postSc);
-  document.getElementById("dInfo").textContent=`${ud.nm} 您好，前測 ${preSc}分 → 後測 ${postSc}分（${Math.round(postSc/QS.length*100)}%）。感謝您的填寫！`;
+  document.getElementById("dTitle").innerHTML=pass?`🎓 恭喜 <span style="color:var(--bp)">${ud.nm}</span> 完成認證！`:`感謝 <span style="color:var(--bp)">${ud.nm}</span> 的參與！`;
+  document.getElementById("dInfo").textContent=`${ud.nm}・${ud.ti}・${ud.cl}`;
+  document.getElementById("dScoreCard").innerHTML=`
+    <div class="rc2 ${pass?"rcp":"rcf"}" style="margin:0 auto 12px"><div class="rsn2">${postSc}</div><div class="rd">/ ${QS.length}</div></div>
+    <div class="rti">${pass?"🎉 恭喜通過後測！":""}</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap">
+      <div style="background:var(--gl);border-radius:var(--rs);padding:7px 16px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)">
+        <span style="color:#88aacc">前測：</span><strong style="color:var(--bd)">${preSc} / ${PRE_QS.length}</strong>
+        <span style="color:#88aacc;margin-left:4px">(${Math.round(preSc/PRE_QS.length*100)}%)</span>
+      </div>
+      <div style="background:var(--gl);border-radius:var(--rs);padding:7px 16px;border:1px solid var(--br);font-size:calc(var(--fs) - 1px)">
+        <span style="color:#88aacc">後測：</span><strong style="color:var(--ok)">${postSc} / ${QS.length}</strong>
+        <span style="color:#88aacc;margin-left:4px">(${Math.round(postSc/QS.length*100)}%)</span>
+      </div>
+      ${postSc>preSc?`<div style="background:#eafaf1;border-radius:var(--rs);padding:7px 14px;border:1px solid #a3d9b1;font-size:calc(var(--fs) - 1px);color:var(--ok)">📈 進步了 ${postSc-preSc} 題！</div>`:""}
+    </div>`;
+  // 答題明細（含解析）— 因通過者跳過成績複習頁，在完成頁重現
+  const dBd=QS.map((q,i)=>{
+    const ok=postAns[i]===_qa(q);
+    return `<div class="bi"><div class="bico">${ok?"✅":"❌"}</div><div class="bq"><div><strong>Q${i+1}.</strong> ${q.q}</div>${!ok?`<div style="margin-top:4px"><button class="btgl" onclick="tExpD(${i})">查看解析</button></div><div class="bexp" id="dex${i}"><strong>解析：</strong>${_qe(q)}</div>`:""}</div></div>`;
+  }).join("");
+  document.getElementById("dReview").innerHTML=dBd;
+  document.getElementById("dReviewCard").style.display="block";
   show("scDn");
+}
+function tExpD(i){
+  var e=document.getElementById("dex"+i),b=e.previousElementSibling.querySelector(".btgl"),s=e.classList.toggle("show");
+  b.textContent=s?"收起解析":"查看解析";
 }
 
 // ── Slideshow ──
@@ -1450,6 +1567,7 @@ function doPost(e) {
 }
 
 function submitScoreToSheet() {
+  if(_DEBUG){console.log('%c[DEBUG] submitScoreToSheet 已攔截，不會真的寫入 Sheet','color:#e67e22;font-weight:bold');return;}
   const K2 = ["A","B","C","D"];
   const preLetters = preAns.map(function(a) { return a !== null ? K2[a] : ""; });
   const postLetters = postAns.map(function(a) { return a !== null ? K2[a] : ""; });
@@ -1476,6 +1594,7 @@ function submitScoreToSheet() {
 }
 
 function submitSurveyToSheet(preSc, postSc) {
+  if(_DEBUG){console.log('%c[DEBUG] submitSurveyToSheet 已攔截，不會真的寫入 Sheet','color:#e67e22;font-weight:bold');return;}
   const labels = ["非常滿意","滿意","普通","不滿意","非常不滿意"];
   var q6Checked = Array.from(document.querySelectorAll("input[name=sq6]:checked"))
                        .map(function(el){return el.value;}).join("、");
