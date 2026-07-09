@@ -244,6 +244,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <!-- 🧪 測試模式面板：僅在網址加上 ?debug=1 時顯示（正式上線前仍建議刪除整個 div）-->
 <div id="debug-panel" style="display:none;position:fixed;bottom:12px;left:12px;z-index:9999;background:rgba(20,20,30,.92);border:1px solid #555;border-radius:10px;padding:.6rem .8rem;font-family:sans-serif;font-size:.75rem;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.4);">
   <div style="font-weight:700;margin-bottom:.4rem;color:#7dd3fc;">🧪 測試模式（略過流程）</div>
+  <div style="color:#4ade80;font-size:.66rem;margin-bottom:.4rem;">✓ 此模式下不會寫入 Google Sheet</div>
   <div style="display:flex;flex-direction:column;gap:.3rem;">
     <button onclick="debugJumpResult(true)" style="cursor:pointer;padding:.3rem .5rem;border:none;border-radius:6px;background:#16a34a;color:#fff;font-size:.72rem;">跳到結果：通過</button>
     <button onclick="debugJumpResult(false)" style="cursor:pointer;padding:.3rem .5rem;border:none;border-radius:6px;background:#dc2626;color:#fff;font-size:.72rem;">跳到結果：未通過</button>
@@ -403,6 +404,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
     <div class="result-btns">
       <button class="btn-primary" id="btn-survey" onclick="playSound('nav');setStep(5);showScreen('survey-screen')" style="display:none;background:linear-gradient(135deg,#6c3fc5,#9b59b6);animation:pulseSurvey 1.6s ease-in-out infinite;">📝 填寫課後問卷</button>
+      <button class="btn-primary" id="btn-back-menu" onclick="playSound('nav');window.location.href='https://oscar200011.github.io/medical-security-quiz/quiz/';" style="display:none;background:linear-gradient(135deg,#0066cc,#00a3cc);">📚 返回考試選單</button>
       <button class="btn-secondary" onclick="playSound('nav');showReview()">📋 查看解析</button>
       <button class="btn-secondary" onclick="playSound('nav');restartAll()">重新考試</button>
     </div>
@@ -423,7 +425,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
       <!-- Q1 -->
       <div class="survey-q" id="sq1">
-        <div class="survey-q-num">問題 1 / 5</div>
+        <div class="survey-q-num">問題 1 / 6</div>
         <div class="survey-q-text">1. 這次課程內容對您的實際工作有幫助嗎？</div>
         <div class="likert-row" id="sq1-row">
           <button class="likert-btn" onclick="playSound('select');setSurvey(1,1,this)">1<br><span style="font-size:.68rem">完全沒幫助</span></button>
@@ -437,7 +439,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
       <!-- Q2 -->
       <div class="survey-q" id="sq2">
-        <div class="survey-q-num">問題 2 / 5</div>
+        <div class="survey-q-num">問題 2 / 6</div>
         <div class="survey-q-text">2. 教材的難易度是否適中？</div>
         <div class="likert-row" id="sq2-row">
           <button class="likert-btn" onclick="playSound('select');setSurvey(2,1,this)">1<br><span style="font-size:.68rem">太難</span></button>
@@ -451,7 +453,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
       <!-- Q3 -->
       <div class="survey-q" id="sq3">
-        <div class="survey-q-num">問題 3 / 5</div>
+        <div class="survey-q-num">問題 3 / 6</div>
         <div class="survey-q-text">3. 課程內容具有實用性，與實際工作情境相關</div>
         <div class="likert-row" id="sq3-row">
           <button class="likert-btn" onclick="playSound('select');setSurvey(3,1,this)">1<br><span style="font-size:.68rem">非常不同意</span></button>
@@ -463,25 +465,39 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="likert-labels"><span>非常不同意</span><span>非常同意</span></div>
       </div>
 
-      <!-- Q4 -->
+      <!-- Q4 新增:課程設計與主題目標 -->
       <div class="survey-q" id="sq4">
-        <div class="survey-q-num">問題 4 / 5</div>
-        <div class="survey-q-text">4. 您對整體課程的滿意度？</div>
+        <div class="survey-q-num">問題 4 / 6</div>
+        <div class="survey-q-text">4. 課程內容設計與主題目標相符</div>
         <div class="likert-row" id="sq4-row">
-          <button class="likert-btn" onclick="playSound('select');setSurvey(4,1,this)">1<br><span style="font-size:.68rem">非常不滿意</span></button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(4,1,this)">1<br><span style="font-size:.68rem">非常不同意</span></button>
           <button class="likert-btn" onclick="playSound('select');setSurvey(4,2,this)">2</button>
           <button class="likert-btn" onclick="playSound('select');setSurvey(4,3,this)">3<br><span style="font-size:.68rem">普通</span></button>
           <button class="likert-btn" onclick="playSound('select');setSurvey(4,4,this)">4</button>
-          <button class="likert-btn" onclick="playSound('select');setSurvey(4,5,this)">5<br><span style="font-size:.68rem">非常滿意</span></button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(4,5,this)">5<br><span style="font-size:.68rem">非常同意</span></button>
+        </div>
+        <div class="likert-labels"><span>非常不同意</span><span>非常同意</span></div>
+      </div>
+
+      <!-- Q5 滿意度 -->
+      <div class="survey-q" id="sq5">
+        <div class="survey-q-num">問題 5 / 6</div>
+        <div class="survey-q-text">5. 您對整體課程的滿意度？</div>
+        <div class="likert-row" id="sq5-row">
+          <button class="likert-btn" onclick="playSound('select');setSurvey(5,1,this)">1<br><span style="font-size:.68rem">非常不滿意</span></button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(5,2,this)">2</button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(5,3,this)">3<br><span style="font-size:.68rem">普通</span></button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(5,4,this)">4</button>
+          <button class="likert-btn" onclick="playSound('select');setSurvey(5,5,this)">5<br><span style="font-size:.68rem">非常滿意</span></button>
         </div>
         <div class="likert-labels"><span>非常不滿意</span><span>非常滿意</span></div>
       </div>
 
-      <!-- Q5 開放填答 -->
-      <div class="survey-q" id="sq5">
-        <div class="survey-q-num">問題 5 / 5</div>
-        <div class="survey-q-text">5. 對本課程有任何建議或意見嗎？（選填）</div>
-        <textarea class="survey-textarea" id="sq5-text" placeholder="請輸入您的建議...（選填）"></textarea>
+      <!-- Q6 開放填答 -->
+      <div class="survey-q" id="sq6">
+        <div class="survey-q-num">問題 6 / 6</div>
+        <div class="survey-q-text">6. 對本課程有任何建議或意見嗎？（選填）</div>
+        <textarea class="survey-textarea" id="sq6-text" placeholder="請輸入您的建議...（選填）"></textarea>
       </div>
 
       <!-- 完成畫面 -->
@@ -489,8 +505,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
         <div class="done-icon">🎉</div>
         <h3>感謝您的回饋！</h3>
         <p>您的意見將幫助我們持續改善課程品質</p>
-        <button class="btn-primary" style="margin-top:1.25rem;width:100%;max-width:300px;background:linear-gradient(135deg,#0066cc,#00a3cc);" onclick="playSound('nav');window.location.href='https://oscar200011.github.io/medical-security-quiz/quiz/';">📚 返回考試選單</button>
-        <button class="btn-secondary" style="margin-top:.6rem;width:100%;max-width:300px;" onclick="playSound('nav');showScreen('result-screen')">🏆 查看成績與解析</button>
+        <div style="margin-top:1rem;color:var(--muted);font-size:.9rem;">正在為您揭曉成績…</div>
       </div>
 
       <div class="survey-actions" id="survey-actions">
@@ -846,8 +861,9 @@ function debugJumpSurveyDone(){
   document.getElementById('survey-done').style.display = 'block';
 }
 
+let surveyCompleted = false; // 課後問卷是否已完成
+
 function calcResult(){
-  showScreen('result-screen');
   let correct=0;
   qs.forEach((q,i)=>{if(ans[i]===q.answer)correct++;});
   const wrong=qs.length-correct;
@@ -879,14 +895,19 @@ function calcResult(){
   if(pass){
     document.getElementById('rtitle').textContent='🎉 恭喜通過認證！';
     document.getElementById('rmsg').textContent='您已通過醫療院所資安認證考試，得分 '+pct+' 分（及格線 '+CFG.PASS+' 分）。';
-    // 通過後：先填問卷，問卷完成才顯示證書
-    document.getElementById('btn-survey').style.display='inline-block';
-    document.getElementById('survey-prompt').style.display='block';
     lastScore=pct; lastPassed=true;
     syncScoreToGSheet(pass);
-    playSound("pass");
-    launchConfetti();
     saveRecord();
+    if(!surveyCompleted){
+      // 通過 → 先填課後問卷,填完才揭曉成績(慶祝效果延後到成績頁)
+      setStep(5);
+      showScreen('survey-screen');
+      playSound('nav');
+    }else{
+      // 問卷已填過(重考情境)→ 直接看成績
+      showScreen('result-screen');
+      celebrateResult();
+    }
     // ── 送到後端儲存 ──
     submitData({name:regData.name,clinic:regData.clinic,code:regData.code,
       title:regData.title,email:regData.email||'',
@@ -895,6 +916,7 @@ function calcResult(){
     document.getElementById('rtitle').textContent='繼續加油！';
     document.getElementById('rmsg').textContent='本次得分 '+pct+' 分，未達及格線（'+CFG.PASS+' 分）。請查看解析後點「重新考試」再次挑戰。';
     lastScore=pct; lastPassed=false;
+    showScreen('result-screen');
     syncScoreToGSheet(pass);
     // ── 送到後端儲存（未通過也記錄）──
     submitData({name:regData.name,clinic:regData.clinic,code:regData.code,
@@ -902,6 +924,21 @@ function calcResult(){
       score:pct,correct:correct,wrong:wrong,total:qs.length,passed:false});
   }
 
+}
+
+// 揭曉成績時的慶祝效果(通過時)+ 圓環動畫重播
+function celebrateResult(){
+  const ring=document.getElementById('ringfill');
+  if(ring){
+    const target = ring.style.strokeDashoffset;
+    ring.style.transition='none';
+    ring.style.strokeDashoffset='263.9';
+    setTimeout(()=>{ ring.style.transition=''; ring.style.strokeDashoffset=target; },250);
+  }
+  if(lastPassed){
+    playSound('pass');
+    launchConfetti();
+  }
 }
 
 function saveRecord(){
@@ -962,8 +999,12 @@ function syncScoreToGSheet(pass){
   sendScorePayload(payload);
 }
 
+// 是否為測試模式(?debug=1):測試模式下不寫入 Google Sheet
+const IS_DEBUG_MODE = (()=>{ try{ return new URLSearchParams(location.search).get('debug')==='1'; }catch(e){ return false; } })();
+
 // 送出成績:失敗時存入本機佇列,下次開啟頁面自動補送
 function sendScorePayload(payload){
+  if(IS_DEBUG_MODE){ console.warn('[測試模式] 已攔截寫入:', payload.action); return; }
   fetch(CFG.GSHEET_URL,{
     method:'POST',
     mode:'no-cors',
@@ -988,6 +1029,7 @@ function queuePendingScore(payload){
 // 頁面載入時補送先前失敗的成績
 (function retryPendingScores(){
   try{
+    if(IS_DEBUG_MODE) return;
     const q = JSON.parse(localStorage.getItem('pendingScores')||'[]');
     if(!q.length || !CFG.GSHEET_URL || CFG.GSHEET_URL==='YOUR_GOOGLE_APPS_SCRIPT_URL') return;
     localStorage.removeItem('pendingScores');
@@ -1047,6 +1089,9 @@ function restartAll(){
   preTestAns = {}; preTestDone = false; preTestScore = 0; quizMode='pre';
   // 重置問卷狀態
   Object.keys(surveyAns).forEach(k => delete surveyAns[k]);
+  surveyCompleted = false;
+  const btnBackMenu = document.getElementById('btn-back-menu');
+  if(btnBackMenu) btnBackMenu.style.display = 'none';
   const survDone    = document.getElementById('survey-done');
   const survActions = document.getElementById('survey-actions');
   const survProg    = document.getElementById('survey-prog');
@@ -1059,10 +1104,10 @@ function restartAll(){
   if(surveyPrompt) surveyPrompt.style.display = 'none';
   // 重置問卷選項（取消所有選取）
   document.querySelectorAll('.likert-btn.sel').forEach(el => el.classList.remove('sel'));
-  const sq5 = document.getElementById('sq5-text');
-  if(sq5) sq5.value = '';
+  const sq6 = document.getElementById('sq6-text');
+  if(sq6) sq6.value = '';
   // 重置問卷每題顯示
-  [1,2,3,4,5].forEach(i => {
+  [1,2,3,4,5,6].forEach(i => {
     const el = document.getElementById('sq'+i);
     if(el) el.style.display = '';
   });
@@ -1081,36 +1126,43 @@ function setSurvey(qNum, val, btn){
   const row = document.getElementById('sq'+qNum+'-row');
   if(row) row.querySelectorAll('.likert-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
-  // 更新進度條（前4題計算）
-  const answered = [1,2,3,4].filter(i=>surveyAns[i]!==undefined).length;
-  document.getElementById('survey-prog').style.width = (answered/5*100)+'%';
+  // 更新進度條（前5題計算）
+  const answered = [1,2,3,4,5].filter(i=>surveyAns[i]!==undefined).length;
+  document.getElementById('survey-prog').style.width = (answered/6*100)+'%';
 }
 
 function submitSurvey(){
-  // 檢查1-4題是否填寫
-  const missing = [1,2,3,4].filter(i=>surveyAns[i]===undefined);
+  // 檢查1-5題是否填寫
+  const missing = [1,2,3,4,5].filter(i=>surveyAns[i]===undefined);
   if(missing.length > 0){
     alert('請完成第 '+missing.join('、')+' 題再送出');
     return;
   }
-  surveyAns[5] = document.getElementById('sq5-text').value.trim();
+  surveyAns[6] = document.getElementById('sq6-text').value.trim();
   document.getElementById('survey-prog').style.width = '100%';
   document.getElementById('survey-actions').style.display = 'none';
   document.getElementById('survey-done').style.display = 'block';
   // 隱藏所有問題
-  [1,2,3,4,5].forEach(i=>{
+  [1,2,3,4,5,6].forEach(i=>{
     const el = document.getElementById('sq'+i);
     if(el) el.style.display='none';
   });
   // 送到後端
   submitSurveyData();
+  surveyCompleted = true;
   setStep(6); // 全部步驟標記完成
-  // 停留在感謝畫面,由考生自行選擇「返回考試選單」或「查看成績與解析」
-  // (先把成績頁上的問卷入口藏起來,避免回去後重複填寫)
+  // 成績頁:隱藏問卷入口,顯示「返回考試選單」
   const btnSurvey = document.getElementById('btn-survey');
   if(btnSurvey) btnSurvey.style.display='none';
   const surveyPrompt = document.getElementById('survey-prompt');
   if(surveyPrompt) surveyPrompt.style.display='none';
+  const btnBack = document.getElementById('btn-back-menu');
+  if(btnBack) btnBack.style.display='inline-block';
+  // 短暫顯示感謝畫面後,自動揭曉成績
+  setTimeout(()=>{
+    showScreen('result-screen');
+    celebrateResult();
+  }, 1200);
 }
 
 function submitSurveyData(){
@@ -1129,7 +1181,8 @@ function submitSurveyData(){
       q2: surveyAns[2],
       q3: surveyAns[3],
       q4: surveyAns[4],
-      q5: surveyAns[5]||'',
+      q5: surveyAns[5],
+      q6: surveyAns[6]||'',
     };
     sendScorePayload(survPayload); // 沿用成績送出的失敗補送機制
   }
