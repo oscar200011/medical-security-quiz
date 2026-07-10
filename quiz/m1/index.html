@@ -35,6 +35,23 @@
   #pic.fading{opacity:0}
   .zone{position:absolute;top:0;bottom:0;width:20%;z-index:2}
   #zonePrev{left:0}#zoneNext{right:0}
+  #zoomBtn{position:absolute;top:22px;right:26px;z-index:4;
+           border:none;background:rgba(255,255,255,.92);color:var(--pink);
+           width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;
+           box-shadow:0 2px 10px rgba(236,72,153,.3)}
+  #zoomBtn:active{transform:scale(.94)}
+  #zoomOverlay{display:none;position:fixed;inset:0;background:rgba(20,10,16,.96);z-index:100;
+               flex-direction:column}
+  #zoomOverlay.active{display:flex}
+  #zoomBar{display:flex;align-items:center;gap:14px;padding:10px 16px;
+           padding-top:calc(10px + env(safe-area-inset-top));justify-content:center}
+  #zoomBar button{border:none;background:rgba(255,255,255,.15);color:#fff;
+                  width:42px;height:42px;border-radius:50%;font-size:20px;font-weight:800;cursor:pointer}
+  #zoomBar button:active{background:rgba(255,255,255,.3)}
+  #zoomLevel{color:#fff;font-weight:700;min-width:56px;text-align:center;font-variant-numeric:tabular-nums}
+  #zoomClose{margin-left:10px}
+  #zoomScroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+  #zoomImg{display:block;margin:0 auto;width:100%}
   #tip{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
        background:rgba(236,72,153,.85);color:#fff;font-size:13px;
        padding:6px 16px;border-radius:999px;pointer-events:none;
@@ -66,6 +83,7 @@
   <div class="zone" id="zonePrev"></div>
   <div class="zone" id="zoneNext"></div>
   <div id="frame"><img id="pic" alt="教材圖卡"></div>
+  <button id="zoomBtn" title="放大檢視">🔍</button>
   <div id="tip">點擊或滑動翻頁,看完全部圖卡即可開始測驗</div>
 </div>
 
@@ -75,6 +93,16 @@
   <span id="spacer"></span>
   <button id="goSite" disabled>🔒 尚餘 <span id="remain"></span> 張</button>
 </footer>
+
+<div id="zoomOverlay">
+  <div id="zoomBar">
+    <button id="zoomOut">−</button>
+    <span id="zoomLevel">100%</span>
+    <button id="zoomIn">＋</button>
+    <button id="zoomClose">✕</button>
+  </div>
+  <div id="zoomScroll"><img id="zoomImg" alt="放大檢視"></div>
+</div>
 
 <script>
 /* ================= 設定區 ================= */
@@ -147,6 +175,36 @@ stage.addEventListener('touchend', e => {
   if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)*1.5){ dx < 0 ? next() : prev(); }
   tx = ty = null;
 }, {passive:true});
+
+/* ---- 放大檢視 ---- */
+const zoomOverlay = document.getElementById('zoomOverlay');
+const zoomImg = document.getElementById('zoomImg');
+const zoomLevelEl = document.getElementById('zoomLevel');
+const LEVELS = [1, 1.5, 2, 3];
+let zi = 0;
+
+function applyZoom(){
+  zoomImg.style.width = (LEVELS[zi] * 100) + '%';
+  zoomLevelEl.textContent = Math.round(LEVELS[zi] * 100) + '%';
+}
+function openZoom(){
+  zoomImg.src = url(idx);
+  zi = 0;
+  applyZoom();
+  zoomOverlay.classList.add('active');
+  document.getElementById('zoomScroll').scrollTop = 0;
+}
+function closeZoom(){ zoomOverlay.classList.remove('active'); }
+
+document.getElementById('zoomBtn').onclick = e => { e.stopPropagation(); openZoom(); };
+document.getElementById('zoomClose').onclick = closeZoom;
+document.getElementById('zoomIn').onclick  = () => { if (zi < LEVELS.length-1){ zi++; applyZoom(); } };
+document.getElementById('zoomOut').onclick = () => { if (zi > 0){ zi--; applyZoom(); } };
+zoomImg.ondblclick = () => { zi = (zi + 1) % LEVELS.length; applyZoom(); };
+document.addEventListener('keydown', e => {
+  if (!zoomOverlay.classList.contains('active')) return;
+  if (e.key === 'Escape') closeZoom();
+});
 
 setTimeout(()=>{ document.getElementById('tip').style.opacity = 0; }, 4000);
 show(0);
