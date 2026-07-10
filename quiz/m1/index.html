@@ -40,6 +40,19 @@
            width:44px;height:44px;border-radius:50%;font-size:20px;cursor:pointer;
            box-shadow:0 2px 10px rgba(236,72,153,.3)}
   #zoomBtn:active{transform:scale(.94)}
+  #zoomBtn.pulse{animation:pulse 1.6s ease-in-out 3}
+  @keyframes pulse{
+    0%,100%{box-shadow:0 2px 10px rgba(236,72,153,.3)}
+    50%{box-shadow:0 0 0 12px rgba(236,72,153,.25);transform:scale(1.12)}
+  }
+  #zoomHint{position:absolute;top:74px;right:20px;z-index:4;
+            background:var(--pink);color:#fff;font-size:13px;font-weight:700;
+            padding:8px 14px;border-radius:12px;pointer-events:none;
+            opacity:0;transition:opacity .3s;white-space:nowrap;
+            box-shadow:0 4px 14px rgba(236,72,153,.4)}
+  #zoomHint::before{content:'';position:absolute;top:-6px;right:18px;
+            border:6px solid transparent;border-bottom-color:var(--pink);border-top:none}
+  #zoomHint.show{opacity:1}
   #zoomOverlay{display:none;position:fixed;inset:0;background:rgba(20,10,16,.96);z-index:100;
                flex-direction:column}
   #zoomOverlay.active{display:flex}
@@ -84,7 +97,8 @@
   <div class="zone" id="zoneNext"></div>
   <div id="frame"><img id="pic" alt="教材圖卡"></div>
   <button id="zoomBtn" title="放大檢視">🔍</button>
-  <div id="tip">點擊或滑動翻頁,看完全部圖卡即可開始測驗</div>
+  <div id="zoomHint">字太小?點 🔍 放大看</div>
+  <div id="tip">點擊或滑動翻頁 · 右上 🔍 可放大 · 看完全部即可測驗</div>
 </div>
 
 <footer>
@@ -143,6 +157,7 @@ function show(i){
   document.getElementById('btnPrev').disabled = (idx === 0);
   document.getElementById('btnNext').disabled = (idx === CARDS.length-1);
   preload(idx+1); preload(idx+2);
+  if (idx === CARDS.length-1) showZoomHint();
   updateGate();
 }
 const next = () => show(idx+1);
@@ -187,7 +202,23 @@ function applyZoom(){
   zoomImg.style.width = (LEVELS[zi] * 100) + '%';
   zoomLevelEl.textContent = Math.round(LEVELS[zi] * 100) + '%';
 }
+let zoomUsed = false;
+const zoomHint = document.getElementById('zoomHint');
+let hintTimer = null;
+function showZoomHint(){
+  if (zoomUsed) return;
+  zoomHint.classList.add('show');
+  document.getElementById('zoomBtn').classList.add('pulse');
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(()=>{
+    zoomHint.classList.remove('show');
+    document.getElementById('zoomBtn').classList.remove('pulse');
+  }, 5000);
+}
 function openZoom(){
+  zoomUsed = true;
+  zoomHint.classList.remove('show');
+  document.getElementById('zoomBtn').classList.remove('pulse');
   zoomImg.src = url(idx);
   zi = 0;
   applyZoom();
