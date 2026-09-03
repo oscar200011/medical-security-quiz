@@ -221,7 +221,7 @@ textarea.fi{width:100%; padding:11px 13px; border:1.5px solid var(--br); border-
 </style>
 </head>
 <body>
-<div class="a11y"><span class="lbl">字級</span><button onclick="fontStep(-1)">A-</button><button onclick="fontStep(1)">A+</button></div>
+<div class="a11y"><span class="lbl">字級</span><button onclick="fontStep(-1)">A-</button><button onclick="fontStep(1)">A+</button><button id="muteBtn" onclick="toggleMute()" title="音效開關" style="font-size:15px">🔊</button></div>
 
 <div class="hero">
   <div class="hero-inner">
@@ -567,6 +567,7 @@ function rlOk(){ var rl=_getRl(); if(Date.now()-rl.ts>86400000) return true; ret
 /* ===== 音效回饋 ===== */
 var _ac=null;
 function beep(f,d,type){
+  if(_muted) return;
   try{
     if(!_ac) _ac=new (window.AudioContext||window.webkitAudioContext)();
     var o=_ac.createOscillator(),g=_ac.createGain();
@@ -581,6 +582,11 @@ var sfxPick=function(){beep(560,.07)}, sfxNext=function(){beep(720,.09)},
     sfxSubmit=function(){beep(480,.12,'triangle')},
     sfxDone=function(){beep(660,.1);setTimeout(function(){beep(880,.16)},110)},
     sfxLock=function(){beep(300,.15,'sawtooth')};
+
+var _muted=false;
+try{ _muted = localStorage.getItem('exam_muted')==='1'; }catch(e){}
+function applyMute(){ var b=document.getElementById('muteBtn'); if(b){ b.textContent=_muted?'🔇':'🔊'; b.style.opacity=_muted?'.55':'1'; } }
+function toggleMute(){ _muted=!_muted; try{ localStorage.setItem('exam_muted', _muted?'1':'0'); }catch(e){} applyMute(); if(!_muted) beep(560,.07); }
 
 /* ===== 字級（7 段） ===== */
 var _FS=[13,14,15,16,17,18,20], _fsIdx=3;
@@ -735,11 +741,11 @@ function showPostRs(){
 
 /* ===== 課後問卷 ===== */
 var SCALE_Q=[
-  ['q1_fit','課程內容與我的實務工作相符'],
-  ['q2_practical','課程內容對日常作業有實際幫助'],
-  ['q3_schedule','課程時間安排恰當'],
-  ['q4_comprehension','我能理解 MobiHIS 平台的操作'],
-  ['q5_confidence','我有信心獨立完成平台登載作業']
+  ['q1_clarity','教材內容清楚、易於理解'],
+  ['q2_useful','課程內容對我的實務工作有幫助'],
+  ['q3_difficulty','測驗難易度適中'],
+  ['q4_process','測驗流程與時間安排恰當'],
+  ['q5_overall','整體而言，我對這次測驗感到滿意']
 ];
 var SCALE_LABELS=['非常不同意','不同意','普通','同意','非常同意'];
 var INTERESTS=['平台進階操作','轉診與追蹤流程','問卷與獎勵金作業','報告登載與佐證上傳','異常個案處理','其他'];
@@ -906,7 +912,7 @@ function dbgSv(){ _fakeReg(); preScore=6; postScore=9; goSv(); }
 
 /* ===== 啟動 ===== */
 (function boot(){
-  initDebug();
+  initDebug(); applyMute();
   if(_jump==='end'){ _fakeReg(); postAns=[]; QS.forEach(function(q,i){postAns[i]=_qa(q);}); preScore=6; postScore=scoreOf(postAns); fillDone(); show('scDn'); setStep(5); return; }
   goReg();
 })();
